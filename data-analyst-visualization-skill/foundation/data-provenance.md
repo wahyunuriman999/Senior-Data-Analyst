@@ -1,4 +1,4 @@
-# DATA PROVENANCE ENGINE
+﻿# DATA PROVENANCE ENGINE
 **Phase A — Foundation Brain | Engine A4**
 **Depth Contract: FULL**
 
@@ -227,15 +227,45 @@ Step 5: Verify reproducibility
 
 ## MATHEMATICAL DEFINITIONS
 
-**Measure Preservation Invariant:**
+**Measure Reconciliation Rules by Transformation Class:**
 ```
-For any transformation T applied to dataset D:
-    Σ(measure, D) = Σ(measure, T(D))
+Measure preservation is NOT universal.
+Expected behavior depends on the class of transformation applied.
+For each transformation, verify the rule below and record the outcome.
 
-EXCEPTIONS (document explicitly):
-    Filtering: Σ drops by exactly the sum of removed rows (verifiable)
-    Aggregation: Σ must be preserved
-    Join with fan-out: Σ will be inflated by φ (must be corrected)
+FILTER
+    Expected: POST_SUM = PRE_SUM - SUM(measure of removed rows)
+    Verify: log pre-filter sum, post-filter sum, and sum of dropped rows.
+    Tolerance: difference must equal the contribution of removed rows exactly.
+
+AGGREGATION (additive measure)
+    Expected: SUM(aggregated groups) = PRE_SUM over source population
+    Verify: compare group totals to source total.
+    Non-additive measures (avg, rate, %) do NOT reconcile this way.
+
+JOIN
+    Expected: POST_SUM = PRE_SUM only when phi = 1 (no fan-out).
+    When phi > 1: POST_SUM will differ from PRE_SUM.
+    Measure inflation must be calculated independently:
+        Delta_measure = (POST_SUM - PRE_SUM) / |PRE_SUM| * 100%
+    Reconciliation failure here indicates fan-out — see Join Audit Engine (A3).
+
+DERIVATION / CALCULATED COLUMN
+    Expected: depends on the formula; no universal reconciliation.
+    Verify: spot-check derived values against manual calculation on sample rows.
+
+DEDUPLICATION
+    Expected: POST_SUM < PRE_SUM by the contribution of deduplicated rows.
+    Verify: log the sum contributed by removed duplicates.
+
+CURRENCY / UNIT CONVERSION
+    Expected: POST_SUM = PRE_SUM * conversion_rate (or per-row rate if multi-currency).
+    Verify: reconcile against the FX rate applied and document the rate source and date.
+
+RESHAPE (pivot / unpivot / melt)
+    Expected: measure semantics may change; verify that sum of reshaped values
+              equals the pre-reshape total where the measure is additive.
+    Flag any measure that is not additive across the reshape operation.
 ```
 
 **Provenance Completeness:**
@@ -362,14 +392,14 @@ CONCLUSION:
 
 ## COUNTEREXAMPLES
 
-**Counterexample A � Reconstruction vs. Real Logging:**
+**Counterexample A � Reconstruction vs. Real Logging:**
 `
 WRONG: Logging the transformation steps AFTER execution from memory.
 ? Memory is imperfect; row counts and filters may be misremembered.
 CORRECT: Log each transformation AS it is executed with actual row counts.
 `
 
-**Counterexample B � Claiming Reproducibility on a Live Database:**
+**Counterexample B � Claiming Reproducibility on a Live Database:**
 `
 WRONG: "This analysis is reproducible" for a query run against a live production table.
 ? Data changes daily; re-running tomorrow will produce different results.

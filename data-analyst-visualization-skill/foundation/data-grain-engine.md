@@ -1,4 +1,4 @@
-# DATA GRAIN ENGINE
+﻿# DATA GRAIN ENGINE
 **Phase A — Foundation Brain | Engine A2**
 **Depth Contract: FULL**
 
@@ -264,11 +264,21 @@ Equivalently:
 
 **Fan-out Factor:**
 ```
-φ = N_after_join / N_before_join
+phi = N_after_join / N_before_join
 
-φ = 1 → no fan-out (safe join)
-φ > 1 → fan-out (measures will be inflated by factor φ)
-φ < 1 → data loss from join (check for unmatched rows)
+phi measures ROW MULTIPLICATION ONLY.
+phi does NOT directly determine measure inflation.
+
+phi = 1  -> no row multiplication (safe join at this grain level)
+phi > 1  -> row multiplication detected; each left row matched multiple right rows on average.
+            Measure inflation must be calculated independently:
+            Delta_measure = (POST_SUM - PRE_SUM) / |PRE_SUM| * 100%
+            when PRE_SUM is non-zero.
+            If PRE_SUM = 0: inflation is undefined; report absolute POST_SUM separately.
+phi < 1  -> fewer result rows than left input.
+            Investigate: unmatched left rows, join type (INNER vs LEFT),
+            filtering behavior, duplicate/null key behavior.
+            Do NOT automatically label as data loss without investigation.
 ```
 
 ---
@@ -375,7 +385,7 @@ REQUIRED: Recompute from transactional grain using:
 
 ## COUNTEREXAMPLES
 
-**Counterexample A � Averaging Averages Across Regions:**
+**Counterexample A � Averaging Averages Across Regions:**
 A dataset has `avg_order_value` pre-aggregated per region per month.
 `
 WRONG: AVG(avg_order_value) across all region-month rows
@@ -383,10 +393,10 @@ WRONG: AVG(avg_order_value) across all region-month rows
 RIGHT: SUM(total_revenue) / SUM(order_count) ? volume-weighted correct average.
 `
 
-**Counterexample B � Summing Snapshot Balances Across Time:**
+**Counterexample B � Summing Snapshot Balances Across Time:**
 A `monthly_balances` table has one row per account per month.
 `
-WRONG: SUM(balance) across all 12 months � accounts = 12� the correct value.
+WRONG: SUM(balance) across all 12 months � accounts = 12� the correct value.
 RIGHT: Filter to end-of-period snapshot (December), then SUM(balance) across accounts.
 `
 ## VALIDATION RULES

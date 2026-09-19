@@ -289,7 +289,7 @@ $$M_{ratio} = \frac{\sum_{i \in N} v_i}{\sum_{j \in D} w_j}$$
 where N = numerator population, D = denominator population, v and w are values.
 
 **Weighted Average:**
-$$\bar{x}_w = \frac{\sum_{i=1}^{n} x_i \cdot w_i}{\sum_{i=1}^{n} w_i}$$
+$$\bar{x}_w = \frac{\sum_{i=1}^{n} x_i w_i}{\sum_{i=1}^{n} w_i}$$
 where x_i is the measure value for entity i, w_i is the weight for entity i, and summation bounds are i = 1 to n on BOTH numerator and denominator.
 
 **Period-over-Period Growth Rate:**

@@ -316,7 +316,7 @@ RI < 0.95 → more than 5% data loss → investigate
 | Failure | Symptom | Detection | Severity |
 |---------|---------|-----------|----------|
 | Silent fan-out | Revenue doubled | φ > 1.0 | CRITICAL |
-| N:N join | All measures explode | φ >> 1.0, N:N detected | CRITICAL |
+| N:N join | Row count and aggregates explode (row multiplication is unbounded) | φ >> 1.0, N:N detected | CRITICAL |
 | SCD not filtered | Historical attributes leak into current data | Multiple dim rows per entity | HIGH |
 | Unmatched rows dropped silently | Underreported metrics | RI < 0.95 | HIGH |
 | NULL key exclusion undocumented | Invisible population reduction | NULL count in key | MEDIUM |
