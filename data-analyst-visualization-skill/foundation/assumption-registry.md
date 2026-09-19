@@ -1,4 +1,4 @@
-# ASSUMPTION REGISTRY ENGINE
+﻿# ASSUMPTION REGISTRY ENGINE
 **Phase A — Foundation Brain | Engine A5**
 **Depth Contract: FULL**
 
@@ -74,16 +74,36 @@ MNAR (Missing Not At Random):
     → Simple imputation will bias results
     → Must model missingness explicitly or acknowledge the bias direction
 
-RULE: If missingness mechanism cannot be determined, default to MNAR-safe treatment:
-    → Flag as missing; do NOT impute
-    → Report the missingness rate as an analytical caveat
-    → NEVER silently substitute mean, median, or mode without checking the mechanism first
+EPISTEMIC RULE: Missingness mechanism is an ASSUMPTION, not a provable fact from observed data alone.
+    MCAR/MAR/MNAR cannot be definitively established from the missing data by definition
+    (the missing values are unobserved). Treat any classification as a working hypothesis.
 
+    IF missingness mechanism is not established:
+        1. Preserve missing values — do not impute.
+        2. Quantify missingness rate per column.
+        3. Profile missingness against observed variables (correlate missingness flag with other columns).
+        4. Document the identification limitation explicitly in the Assumption Registry.
+        5. Evaluate plausible mechanisms from domain knowledge (consult stakeholder if needed).
+        6. Run sensitivity analysis when materiality is MEDIUM or higher.
+        7. Do NOT silently substitute mean, median, or mode.
+
+    IF evidence supports MCAR (Little's test or equivalent; missingness uncorrelated with all observed vars):
+        -> MCAR-based treatment (listwise deletion or simple imputation) may be considered.
+        -> Document the test used and its result.
+
+    IF domain/context evidence supports MAR (missingness correlated with observed variable):
+        -> Conditional or model-based imputation may be considered.
+        -> Document the conditioning variable and imputation method.
+
+    IF domain/substantive evidence strongly suggests MNAR (values missing because of their own magnitude):
+        -> MNAR-aware sensitivity analysis or explicit missingness modeling is required.
+        -> Do NOT use simple imputation without bias disclosure.
+        -> Report the plausible direction of bias introduced by any treatment chosen.
 SPECIFIC CASE — NULL REVENUE:
     Revenue = NULL does NOT mean Revenue = 0 unless:
         (a) Business logic explicitly confirms this (e.g., trial user, $0 plan)
         (b) The source system uses NULL to represent zero transaction value
-    If uncertain → classify as MNAR → flag; do NOT impute
+    If uncertain -> do NOT auto-classify as MNAR. Apply Epistemic Rule above.
 
 SPECIFIC CASE — NULL IN DIMENSION:
     NULL product_id might mean:
@@ -167,10 +187,38 @@ COMMON EXCLUSIONS:
     Bot traffic → must define detection method
 
 MATERIALITY THRESHOLD FOR DISCLOSURE:
-    < 1% of data excluded → LOW (note in methodology)
-    1–5% excluded → MEDIUM (disclose prominently)
-    > 5% excluded → HIGH (must validate that exclusion doesn't bias the direction of results)
-    > 20% excluded → CRITICAL (the population is materially different; may invalidate analysis)
+CANONICAL MATERIALITY DEFINITION
+    (Use this definition for ALL materiality assessments in this engine.)
+
+    Materiality is a function of three factors:
+        M = f(effect_magnitude, decision_sensitivity, population_affected)
+
+    MAGNITUDE: How much does the assumption change the metric value?
+        Trivial:    < 0.5%  change in metric
+        Minor:      0.5% - 2% change
+        Moderate:   2% - 10% change
+        Major:      > 10% change
+
+    DECISION_SENSITIVITY: How sensitive is the decision to this metric?
+        LOW:    Directional conclusion unchanged under any reasonable assumption
+        MEDIUM: Conclusion unchanged but magnitude claim affected
+        HIGH:   Conclusion could change if assumption is wrong
+
+    POPULATION: What fraction of the analytical population does this affect?
+        < 1%    -> minor population impact
+        1-5%    -> moderate population impact
+        > 5%    -> major population impact
+        > 20%   -> the analysis may describe a materially different population
+
+    FINAL RATING:
+        LOW:      Trivial magnitude AND Low decision_sensitivity AND < 1% population
+        MEDIUM:   Minor magnitude OR Moderate decision_sensitivity OR 1-5% population
+        HIGH:     Moderate magnitude OR High decision_sensitivity OR > 5% population
+        CRITICAL: Major magnitude OR directional conclusion changes OR > 20% population
+
+    NOTE: A 0.5% change in financial reporting revenue may be CRITICAL.
+          A 5% change in an exploratory insight may be LOW.
+          Always evaluate in context; do not apply thresholds mechanically.
 ```
 
 ---
@@ -195,10 +243,9 @@ For each detected assumption point:
 CLASSIFY:
     Category: [missingness | outlier | definition | exclusion | imputation | model | boundary]
     Materiality: LOW | MEDIUM | HIGH | CRITICAL
-        LOW:      Affects < 0.1% of the metric value
-        MEDIUM:   Affects 0.1% to 2% of the metric value
-        HIGH:     Affects 2% to 10% of the metric value
-        CRITICAL: Affects > 10% of the metric value or changes the directional conclusion
+        (Apply CANONICAL MATERIALITY DEFINITION from Exclusion Assumptions section above.)
+        Evaluate: effect_magnitude x decision_sensitivity x population_affected.
+        Do not use percentage thresholds alone.
 ```
 
 ### STEP 3 — Assess Direction of Bias
@@ -438,7 +485,7 @@ and prominent bias disclosure.
 
 ## COUNTEREXAMPLES
 
-**Counterexample A � Treating "Completed Orders with NULL Revenue" as MCAR:**
+**Counterexample A � Treating "Completed Orders with NULL Revenue" as MCAR:**
 `
 WRONG: NULL revenue is random ? impute with mean.
 ? Investigation reveals: ALL pre-2023 completed orders have NULL revenue (ETL gap).
@@ -446,7 +493,7 @@ WRONG: NULL revenue is random ? impute with mean.
 CORRECT: Exclude from revenue sum; flag in methodology; retrieve from billing system.
 `
 
-**Counterexample B � Not Disclosing a 25% Exclusion:**
+**Counterexample B � Not Disclosing a 25% Exclusion:**
 `
 WRONG: Exclude internal accounts (25% of dataset) silently, present analysis as complete.
 ? Results describe only 75% of the population. Conclusions may not generalize.

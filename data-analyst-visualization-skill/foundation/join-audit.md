@@ -1,4 +1,4 @@
-# JOIN AUDIT ENGINE
+﻿# JOIN AUDIT ENGINE
 **Phase A — Foundation Brain | Engine A3**
 **Depth Contract: FULL**
 
@@ -108,12 +108,32 @@ IF UNINTENTIONAL: STOP. Fix the data model. Do not proceed with N:N join results
 1h. Retrieve grain contract from Engine A2
 ```
 
-**Compute expected relationship:**
+**Compute expected relationship via per-key multiplicity (not global count alone):**
 ```
-IF U_left == N_left AND U_right == N_right → 1:1 join possible
-IF U_left == N_left AND U_right < N_right  → 1:N join (right has duplicates)
-IF U_left < N_left  AND U_right == N_right → N:1 join (left has duplicates = fan-out risk)
-IF U_left < N_left  AND U_right < N_right  → N:N join (DANGER)
+STEP 1a — Profile LEFT key distribution:
+    SELECT join_key, COUNT(*) AS m_L FROM left_table GROUP BY join_key
+    → max_m_L = MAX(m_L)
+
+STEP 1b — Profile RIGHT key distribution:
+    SELECT join_key, COUNT(*) AS m_R FROM right_table GROUP BY join_key
+    → max_m_R = MAX(m_R)
+
+STEP 1c — Classify cardinality from per-key multiplicity:
+    1:1  iff  max_m_L = 1  AND  max_m_R = 1
+    1:N  iff  max_m_L = 1  AND  max_m_R > 1
+    N:1  iff  max_m_L > 1  AND  max_m_R = 1
+    N:N  iff  max_m_L > 1  AND  max_m_R > 1  -> HALT (see N:N policy)
+
+NOTE: Global U_left vs N_left comparison is a PRELIMINARY SCREEN only.
+      It confirms that duplicates exist but cannot identify which specific keys
+      are duplicated or whether those keys overlap on the other side.
+      Per-key multiplicity is required for precise cardinality classification.
+
+EXAMPLE — WHERE GLOBAL COUNT MISLEADS:
+    Left: 100 rows, U_left=99 (one key duplicated)
+    Right: 50 rows, U_right=50 (all unique)
+    Global: N:1 expected; per-key: only 1 key affected
+    Actual fan-out: phi = 101/100 = 1.01, not uniformly 2.0
 ```
 
 **Identify a critical measure for reconciliation:**
@@ -226,21 +246,35 @@ PASS ✓         WARNING → Investigate referential integrity
 
 **Fan-out Factor:**
 ```
-φ = N_result / N_left
+phi = N_result / N_left
 
 Interpretation:
-φ = 1.0 → safe, no row multiplication
-φ = 2.0 → every left row matched 2 right rows on average → all measures doubled
-φ = 1.5 → 50% row inflation → partial fan-out
-```
+phi = 1.0  -> no row multiplication; expected for 1:1 and N:1 joins
+phi = 2.0  -> average row multiplicity of 2 (each left row matched 2 right rows on average)
+phi = 1.5  -> 50% row inflation; partial fan-out
 
-**Measure Inflation:**
+IMPORTANT: phi measures ROW multiplication, not measure inflation directly.
+Measure inflation depends on how the inflated rows are distributed across measure values.
+A phi of 2.0 implies revenue is doubled ONLY if the duplicated rows have the same
+distribution of revenue as the overall population. Verify independently via POST_SUM.
 ```
-Δ% = (POST_SUM - PRE_SUM) / PRE_SUM × 100
-
-Equivalently: Δ% = (φ - 1) × 100 for uniform fan-out
+**Measure Inflation (must be measured independently from phi):**
 ```
+Delta_pct = (POST_SUM - PRE_SUM) / |PRE_SUM| * 100
 
+This is the DEFINITIVE measure of inflation. Compute it directly; do not derive from phi.
+
+WHY phi != Delta_pct in general:
+    If duplicated rows have above-average measure values:
+        Delta_pct > (phi - 1) * 100
+    If duplicated rows have below-average measure values:
+        Delta_pct < (phi - 1) * 100
+    If fan-out is uniform AND measure values are uniformly distributed:
+        Delta_pct = (phi - 1) * 100  [this special case rarely holds in practice]
+
+RULE: Always measure Delta_pct from POST_SUM vs PRE_SUM.
+      Never assume Delta_pct = (phi - 1) * 100.
+```
 **Referential Integrity Score:**
 ```
 RI = 1 - (N_unmatched_left / N_left)
@@ -353,15 +387,15 @@ REQUIRED: Execute Join Audit for each join separately in sequence:
 
 ## COUNTEREXAMPLES
 
-**Counterexample A � Trusting a Named Column as Unique:**
-A table has a column named `order_id` but the actual grain is order � product_line.
+**Counterexample A � Trusting a Named Column as Unique:**
+A table has a column named `order_id` but the actual grain is order � product_line.
 `
 WRONG ASSUMPTION: order_id is unique ? join proceeds ? fan-out f = 3.2
-CORRECT: Profile U_left. Discover order_id repeats 3.2� per order.
+CORRECT: Profile U_left. Discover order_id repeats 3.2� per order.
 ? Adjust grain; add product_line_id to key before joining.
 `
 
-**Counterexample B � Assuming LEFT JOIN Preserves Row Count:**
+**Counterexample B � Assuming LEFT JOIN Preserves Row Count:**
 `
 WRONG: LEFT JOIN always returns the same rows as left table.
 CORRECT: LEFT JOIN returns AT LEAST left table rows, MORE if right has duplicates.

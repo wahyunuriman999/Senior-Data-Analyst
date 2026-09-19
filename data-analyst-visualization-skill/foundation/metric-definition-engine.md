@@ -1,4 +1,4 @@
-# METRIC DEFINITION ENGINE
+﻿# METRIC DEFINITION ENGINE
 **Phase A — Foundation Brain | Engine A1**
 **Depth Contract: FULL**
 
@@ -71,7 +71,8 @@ IF measuring change over time (growth rate, MoM delta)
 
 IF measuring a weighted average (average order value per region weighted by volume)
     → metric_type = weighted
-    → Use weighted mean: Σ(value × weight) / Σ(weight)
+    -> Use weighted mean: Weighted_Mean = [Sum_i(x_i * w_i)] / [Sum_i(w_i)]
+              where i = {1,...,n}; this is NOT equivalent to AVG of pre-aggregated averages
     → DO NOT use simple average of averages
 
 IF combining multiple metrics (EBITDA = Revenue − COGS − OpEx)
@@ -289,6 +290,7 @@ where N = numerator population, D = denominator population, v and w are values.
 
 **Weighted Average:**
 $$\bar{x}_w = \frac{\sum_{i=1}^{n} x_i \cdot w_i}{\sum_{i=1}^{n} w_i}$$
+where x_i is the measure value for entity i, w_i is the weight for entity i, and summation bounds are i = 1 to n on BOTH numerator and denominator.
 
 **Period-over-Period Growth Rate:**
 $$g = \frac{M_{current} - M_{prior}}{|M_{prior}|} \times 100\%$$
