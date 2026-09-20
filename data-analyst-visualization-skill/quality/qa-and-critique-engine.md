@@ -1,4 +1,4 @@
-# QA & SELF-CRITIQUE ENGINE
+﻿# QA & SELF-CRITIQUE ENGINE
 **Phase F — Quality Brain**
 
 ## DEEP OPERATIONAL QA CHECKS
@@ -35,6 +35,7 @@ All outputs must pass these checks. Failure triggers the Self-Critique loop.
 - **Q-STAT-006 Leakage**: Fail: Future data included in temporal training set.
 
 ### VISUALIZATION QA
+- **Q-VIS-000 README BASELINE**: Fail: The UI does not look like the 10 Master Artifacts in README (wrong colors, low density, missing AI panel). Severity: FATAL.
 - **Q-VIS-001 Chart Fit**: Fail: Chart violates visual grammar engine.
 - **Q-VIS-002 Axis**: Fail: Truncated zero baseline on bar chart. Severity: CRITICAL.
 - **Q-VIS-003 Scale**: Fail: Linear scale for exponential data without justification.
