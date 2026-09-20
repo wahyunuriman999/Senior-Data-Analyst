@@ -68,3 +68,13 @@ ISSUE:
   Status: [PASS]
 ```
 Critical/Major FAIL -> Artifact CANNOT be finalized. FIX WITHOUT RETEST = NOT VERIFIED.
+
+### 🚨 Q-VIS-FATAL: THE ANTIGRAVITY IDE SURVIVAL PROTOCOL
+Learn from past systemic failures. When generating HTML Artifacts for the Antigravity IDE, you MUST obey these 4 absolute rules or the dashboard will render BLANK:
+
+1. **THE CSP BLOCKADE (NO EXTERNAL CDNS)**: The Antigravity IDE artifact viewer uses bout:srcdoc which strictly blocks external <script src="https://cdn..."></script> due to Content Security Policy (CSP). You MUST either:
+   - Provide a Python script to download the JS library (like ECharts) and inject it entirely INLINE into the HTML file (e.g., <script>{raw_echarts_code}</script>).
+   - Use non-JS fallback rendering if inline injection is too heavy.
+2. **THE EVENT LISTENER TRAP**: The IDE dynamically injects HTML strings. The DOMContentLoaded event HAS ALREADY FIRED by the time your script runs. NEVER wrap your initialization in document.addEventListener("DOMContentLoaded", ...). Use setTimeout(initFunction, 500) or execute it directly at the bottom of the body.
+3. **THE 0x0 CANVAS COLLAPSE**: ECharts will fail to render (blank grey box) if it is initialized inside a CSS Grid / Flexbox container that relies purely on lex: 1 or % height without a defined pixel height at runtime. You MUST hardcode a fallback height (e.g., .chart-container { height: 320px; width: 100%; }).
+4. **THE POWERSHELL $ ASSASSIN**: Never use double-quoted strings (@"..."@) in PowerShell to write HTML/JS files if they contain dollar signs (like $42M or JS template literals ${c}). PowerShell will evaluate them as null variables and delete them, causing JS Syntax Errors. Always use Python write() or single-quoted here-strings (@'...'@).

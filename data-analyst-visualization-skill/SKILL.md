@@ -74,3 +74,5 @@ ANALYTICAL_RIGOR_VERIFICATION:
 To prevent blank charts and broken UI, you MUST follow these technical constraints:
 1. **POWERSHELL ESCAPING (THE $ BUG)**: When generating HTML/JS files containing $ (for currency or JS template literals like ${c}) via PowerShell, you MUST BOMB-PROOF your script. Use single-quoted here-strings (@' and '@) or Python to write the file. If you use @", PowerShell will evaluate the $ as variables, deleting the numbers and breaking the Javascript!
 2. **ECHARTS RENDERING SAFEGUARD**: NEVER rely on lex: 1 or height: 100% alone for ECharts containers. You MUST provide a hardcoded pixel fallback (e.g., height: 300px; width: 100%;). ECharts will fail to render (0x0 canvas) if the parent grid container does not have explicit dimensions at the exact millisecond of initialization.
+## 🚨 CRITICAL SURVIVAL RULES (LEARNED FROM FAILURES)
+Always reference quality/qa-and-critique-engine.md (Section Q-VIS-FATAL) before generating any HTML artifacts. You must bypass the IDE's CSP, avoid the DOMContentLoaded trap, secure ECharts dimensions, and prevent PowerShell string corruption.
