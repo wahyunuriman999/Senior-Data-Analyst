@@ -1,0 +1,314 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex Elite - SaaS Bento Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --bg-body: #030712;
+            --bg-sidebar: #0B1120;
+            --bg-panel: rgba(17, 24, 39, 0.6);
+            --border: rgba(55, 65, 81, 0.5);
+            --text-main: #F9FAFB;
+            --text-muted: #9CA3AF;
+            
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --green: #10B981;
+            --red: #EF4444;
+            --purple: #8B5CF6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 16px;
+        }
+        .logo { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 40px; display: flex; align-items: center; gap: 10px; letter-spacing: 1px;}
+        .logo-icon { width: 24px; height: 24px; background: linear-gradient(135deg, var(--blue), var(--purple)); border-radius: 6px; }
+        .nav-item { padding: 12px 16px; color: var(--text-muted); font-size: 14px; font-weight: 500; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: 0.2s;}
+        .nav-item:hover, .nav-item.active { background: rgba(59, 130, 246, 0.1); color: var(--blue); }
+
+        /* MAIN LAYOUT */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background-image: radial-gradient(circle at 100% 0%, rgba(59, 130, 246, 0.05), transparent 40%);
+        }
+
+        .header {
+            height: 70px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            backdrop-filter: blur(10px);
+            position: sticky; top: 0; z-index: 10;
+        }
+        .breadcrumb { color: var(--text-muted); font-size: 14px; font-weight: 500; }
+        .breadcrumb span { color: var(--text-main); }
+        .header-actions { display: flex; gap: 16px; align-items: center;}
+        .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--blue); }
+
+        .dashboard-container {
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* KPI ROW */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        .panel {
+            background: var(--bg-panel);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .kpi-label { font-size: 13px; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; }
+        .kpi-value { font-size: 28px; font-weight: 700; font-family: 'Fira Code', monospace; display: flex; align-items: baseline; gap: 10px; }
+        .kpi-trend { font-size: 14px; font-weight: 500; }
+        .trend-up { color: var(--green); }
+        .trend-down { color: var(--red); }
+
+        /* BENTO GRID */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            grid-template-rows: 350px 300px;
+            gap: 20px;
+        }
+
+        .span-8 { grid-column: span 8; }
+        .span-4 { grid-column: span 4; }
+        .span-6 { grid-column: span 6; }
+
+        .chart-header {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chart-tag {
+            font-size: 11px;
+            padding: 4px 8px;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--blue);
+            border-radius: 4px;
+            font-family: 'Fira Code';
+        }
+        .chart-container { flex: 1; width: 100%; height: 100%; }
+
+        /* STORYTELLER PANEL */
+        .story-header { color: var(--cyan); font-family: 'Fira Code'; font-size: 12px; margin-bottom: 12px; display: flex; gap: 8px; align-items: center;}
+        .story-header::before { content: ''; width: 8px; height: 8px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 10px var(--cyan); }
+        
+        .insight {
+            background: rgba(255,255,255,0.02);
+            border-left: 3px solid var(--border);
+            padding: 16px;
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            border-radius: 0 8px 8px 0;
+            color: #D1D5DB;
+        }
+        .insight.danger { border-left-color: var(--red); background: rgba(239, 68, 68, 0.05); }
+        .insight.warn { border-left-color: var(--purple); background: rgba(139, 92, 246, 0.05); }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-icon"></div>
+            APEX OS
+        </div>
+        <div class="nav-item active">Executive Overview</div>
+        <div class="nav-item">Financial Diagnostics</div>
+        <div class="nav-item">Risk & Telemetry</div>
+        <div class="nav-item">Cohort Retention</div>
+        <div class="nav-item">System Settings</div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="breadcrumb">Dashboards / <span>Executive Overview</span></div>
+            <div class="header-actions">
+                <div style="font-family: 'Fira Code'; font-size: 12px; color: var(--green);">[●] SYNCED</div>
+                <div class="avatar"></div>
+            </div>
+        </div>
+
+        <div class="dashboard-container">
+            <!-- KPI ROW -->
+            <div class="kpi-row">
+                <div class="panel">
+                    <div class="kpi-label">Gross Revenue (YTD)</div>
+                    <div class="kpi-value">.2M <span class="kpi-trend trend-up">▲ 12%</span></div>
+                </div>
+                <div class="panel">
+                    <div class="kpi-label">Net Profit Margin</div>
+                    <div class="kpi-value">18.4% <span class="kpi-trend trend-down">▼ 4.1%</span></div>
+                </div>
+                <div class="panel">
+                    <div class="kpi-label">Avg System Latency</div>
+                    <div class="kpi-value" style="color: var(--red);">185ms <span class="kpi-trend trend-down">⚠ Spike</span></div>
+                </div>
+                <div class="panel">
+                    <div class="kpi-label">Active Subscriptions</div>
+                    <div class="kpi-value">12,408 <span class="kpi-trend trend-up">▲ 2.5%</span></div>
+                </div>
+            </div>
+
+            <!-- BENTO GRID -->
+            <div class="bento-grid">
+                
+                <!-- MAIN CHART: Paradox (Span 8) -->
+                <div class="panel span-8">
+                    <div class="chart-header">
+                        Revenue vs Margin (Simpson's Paradox Core)
+                        <span class="chart-tag">Q-FIN-001</span>
+                    </div>
+                    <div id="paradoxChart" class="chart-container"></div>
+                </div>
+
+                <!-- AI INSIGHT: (Span 4) -->
+                <div class="panel span-4">
+                    <div class="story-header">AI AUTO-CRITIQUE (PHASE F)</div>
+                    <div class="insight warn">
+                        <strong>Margin Trap Detected:</strong> Enterprise segment drives 60% of volume but operates at a 4% net margin due to extreme 35% average discounting.
+                    </div>
+                    <div class="insight danger">
+                        <strong>Causal Churn Outlier:</strong> Latency spike to 185ms in APAC is causing a structural 15% churn jump. Immediate load balancing required.
+                    </div>
+                </div>
+
+                <!-- RADAR CHART (Span 4) -->
+                <div class="panel span-4">
+                    <div class="chart-header">
+                        Product Mix Cannibalization
+                        <span class="chart-tag">RADAR</span>
+                    </div>
+                    <div id="radarChart" class="chart-container"></div>
+                </div>
+
+                <!-- SCATTER CHART (Span 8) -->
+                <div class="panel span-8">
+                    <div class="chart-header">
+                        Latency vs Churn Probability Threshold
+                        <span class="chart-tag">OUTLIER DETECTION</span>
+                    </div>
+                    <div id="scatterChart" class="chart-container"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const pChart = echarts.init(document.getElementById('paradoxChart'));
+        const rChart = echarts.init(document.getElementById('radarChart'));
+        const sChart = echarts.init(document.getElementById('scatterChart'));
+        const commonStyle = { textStyle: { fontFamily: 'Inter' } };
+
+        // 1. PARADOX CHART (Bar + Line)
+        pChart.setOption({
+            tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+            legend: { data: ['Gross Volume ()', 'Margin (%)'], textStyle: {color: '#9CA3AF'}, bottom: 0 },
+            grid: { left: '3%', right: '3%', bottom: '15%', top: '5%', containLabel: true },
+            xAxis: { type: 'category', data: ['SMB', 'Mid-Market', 'Enterprise'], axisLabel: {color: '#9CA3AF'}, axisLine: {lineStyle: {color: '#374151'}} },
+            yAxis: [
+                { type: 'value', splitLine: {lineStyle: {color: '#1F2937'}}, axisLabel: {color: '#9CA3AF', fontFamily: 'Fira Code'} },
+                { type: 'value', splitLine: {show: false}, axisLabel: {color: '#9CA3AF', fontFamily: 'Fira Code'} }
+            ],
+            series: [
+                { 
+                    name: 'Gross Volume ()', type: 'bar', barWidth: '30%', yAxisIndex: 0,
+                    itemStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1, [{offset:0, color:'#3B82F6'}, {offset:1, color:'#1E3A8A'}]) },
+                    data: [2.1, 4.5, 8.5]
+                },
+                { 
+                    name: 'Margin (%)', type: 'line', yAxisIndex: 1, symbolSize: 10,
+                    lineStyle: { color: '#10B981', width: 3 }, itemStyle: { color: '#10B981', borderWidth: 2, borderColor: '#fff' },
+                    data: [65, 42, 4]
+                }
+            ]
+        });
+
+        // 2. RADAR CHART
+        rChart.setOption({
+            tooltip: {},
+            radar: {
+                indicator: [ {name:'Analytics', max:100}, {name:'Storage', max:100}, {name:'Compute', max:100}, {name:'Security', max:100}, {name:'Edge', max:100} ],
+                center: ['50%', '50%'], radius: '65%',
+                splitArea: { areaStyle: { color: ['rgba(31, 41, 55, 0.1)', 'rgba(31, 41, 55, 0.2)'] } },
+                axisName: { color: '#9CA3AF' },
+                splitLine: { lineStyle: { color: '#374151' } }
+            },
+            series: [{
+                type: 'radar',
+                data: [
+                    { value: [90, 70, 50, 20, 40], name: 'Q3 Mix', itemStyle: {color: '#3B82F6'}, lineStyle: {width:2}, areaStyle: {opacity: 0.1} },
+                    { value: [40, 60, 40, 95, 30], name: 'Q4 Mix', itemStyle: {color: '#8B5CF6'}, lineStyle: {width:2}, areaStyle: {opacity: 0.3} }
+                ]
+            }]
+        });
+
+        // 3. SCATTER CHART
+        const causalData = [[30,2], [45,1.5], [60,2.1], [80,2.5], [95,2.2], [110,2.8], [130,2.9], [145,3.1], [155, 14], [170, 16], [190, 18], [210, 22]];
+        sChart.setOption({
+            tooltip: { trigger: 'item' },
+            grid: { left: '3%', right: '5%', bottom: '5%', top: '5%', containLabel: true },
+            xAxis: { name: 'Latency', type: 'value', axisLabel: {color: '#9CA3AF'}, splitLine: {lineStyle: {color: '#1F2937'}} },
+            yAxis: { name: 'Churn %', type: 'value', axisLabel: {color: '#9CA3AF'}, splitLine: {lineStyle: {color: '#1F2937', type: 'dashed'}} },
+            series: [{
+                type: 'line', data: causalData, smooth: false, symbolSize: 8,
+                lineStyle: { color: '#EF4444', width: 2 }, itemStyle: { color: '#EF4444' },
+                areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1, [{offset:0, color:'rgba(239, 68, 68, 0.3)'}, {offset:1, color:'rgba(239, 68, 68, 0.01)'}]) },
+                markArea: {
+                    itemStyle: { color: 'rgba(239, 68, 68, 0.1)' },
+                    data: [[{ xAxis: 150, name: 'CRITICAL', label:{color:'#EF4444'} }, { xAxis: 250 }]]
+                }
+            }]
+        });
+
+        window.addEventListener('resize', () => { pChart.resize(); rChart.resize(); sChart.resize(); });
+    </script>
+</body>
+</html>

@@ -1,0 +1,346 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex Elite - Corporate Finance Terminal</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Inter:wght@400;500;700&display=swap');
+        
+        :root {
+            /* Strict README Expectation Colors */
+            --bg-base: #0B1120;
+            --panel-bg: #111827;
+            --border: #374151;
+            --text-main: #F9FAFB;
+            --text-muted: #9CA3AF;
+            
+            /* Semantic Apex Hex Codes (Locked) */
+            --accent-blue: #3B82F6;
+            --accent-cyan: #06B6D4;
+            --accent-green: #10B981;
+            --accent-red: #EF4444;
+            --accent-purple: #8B5CF6;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* High-Density Enterprise Panels */
+        .glass-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 18px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .title-block h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .title-block .subtitle {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            margin-top: 4px;
+        }
+
+        /* KPI Terminal Strip */
+        .kpi-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .kpi-card {
+            border-left: 3px solid var(--accent-blue);
+        }
+        .kpi-card.positive { border-left-color: var(--accent-green); }
+        .kpi-card.negative { border-left-color: var(--accent-red); }
+        .kpi-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;}
+        .kpi-value { font-size: 1.8rem; font-family: 'Fira Code'; font-weight: 700; margin: 4px 0; }
+        .kpi-delta { font-size: 0.8rem; font-family: 'Fira Code'; }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 320px 1.5fr 1fr;
+            grid-template-rows: 400px;
+            gap: 16px;
+        }
+
+        /* AI Insight Sidebar */
+        .ai-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ai-header {
+            font-family: 'Fira Code', monospace;
+            color: var(--accent-blue);
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        .ai-header::before {
+            content: ''; display: block; width: 8px; height: 8px; background: var(--accent-blue); box-shadow: 0 0 8px var(--accent-blue);
+        }
+
+        .insight-box {
+            background: rgba(59, 130, 246, 0.05);
+            border-left: 3px solid var(--accent-blue);
+            padding: 12px;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            color: #D1D5DB;
+        }
+        .insight-box strong { color: #F9FAFB; font-weight: 600; }
+        .insight-box.alert { background: rgba(239, 68, 68, 0.05); border-left-color: var(--accent-red); }
+        .insight-box.success { background: rgba(16, 185, 129, 0.05); border-left-color: var(--accent-green); }
+
+        /* Charts */
+        .chart-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+        .chart-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            color: var(--text-muted);
+        }
+        .chart-container {
+            flex-grow: 1;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 350px;
+            gap: 16px;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="title-block">
+            <h1>CFO TERMINAL // APEX FINANCIAL INTELLIGENCE</h1>
+            <div class="subtitle">LIVE Q3 CONSOLIDATED | METRIC: USD ($) | AUTO-CRITIQUE ENABLED</div>
+        </div>
+        <div style="font-family: 'Fira Code', monospace; font-size: 0.8rem; color: var(--accent-green);">
+            SYS.SYNC: SECURE
+        </div>
+    </header>
+
+    <!-- KPI STRIP -->
+    <div class="kpi-strip">
+        <div class="glass-panel kpi-card positive">
+            <div class="kpi-label">YTD Revenue</div>
+            <div class="kpi-value">.8M</div>
+            <div class="kpi-delta" style="color: var(--accent-green)">▲ +12.4% vs Target</div>
+        </div>
+        <div class="kpi-card glass-panel negative">
+            <div class="kpi-label">Gross Margin</div>
+            <div class="kpi-value">62.1%</div>
+            <div class="kpi-delta" style="color: var(--accent-red)">▼ -4.2% (COGS Overrun)</div>
+        </div>
+        <div class="kpi-card glass-panel positive">
+            <div class="kpi-label">EBITDA</div>
+            <div class="kpi-value">.2M</div>
+            <div class="kpi-delta" style="color: var(--accent-green)">▲ +2.1% vs Target</div>
+        </div>
+        <div class="kpi-card glass-panel">
+            <div class="kpi-label">Free Cash Flow (FCF)</div>
+            <div class="kpi-value">.1M</div>
+            <div class="kpi-delta" style="color: var(--text-muted)">■ In Line</div>
+        </div>
+    </div>
+
+    <!-- UPPER GRID (Sidebar + Sankey + Waterfall) -->
+    <div class="main-grid">
+        
+        <!-- AI Data Storyteller Panel -->
+        <div class="glass-panel ai-sidebar">
+            <div class="ai-header">FINANCIAL AUTO-CRITIQUE</div>
+            
+            <div class="insight-box success">
+                <strong>[Q-FIN-001] Revenue Quality:</strong> 
+                Overall revenue beat budget by .2M. Variance decomposition shows this is driven primarily by Volume (.5M), successfully offsetting negative FX impacts.
+            </div>
+
+            <div class="insight-box alert">
+                <strong>[Q-FIN-003] OPEX Margin Trap:</strong>
+                Cash Flow Sankey indicates R&D spend has ballooned to .2M, consuming 35% of Gross Profit. This violates the 25% target covenant.
+            </div>
+
+            <div class="insight-box">
+                <strong>[Q-VIS-004] OPEX Heatmap:</strong>
+                Seasonal spend analysis shows Q3 Marketing burn rate spiked unexpectedly in September (Red zone). Recommend immediate audit of Q3 ad spend ROI.
+            </div>
+        </div>
+
+        <!-- Cash Flow Sankey (Where the money goes) -->
+        <div class="glass-panel chart-wrapper">
+            <div class="chart-title">Consolidated Cash Flow Allocation (Sankey)</div>
+            <div id="sankeyChart" class="chart-container"></div>
+        </div>
+
+        <!-- Variance Waterfall (EBITDA) -->
+        <div class="glass-panel chart-wrapper">
+            <div class="chart-title">EBITDA Variance vs Budget ()</div>
+            <div id="waterfallChart" class="chart-container"></div>
+        </div>
+    </div>
+
+    <!-- LOWER GRID (Heatmap) -->
+    <div class="bottom-grid">
+        <!-- OPEX Heatmap -->
+        <div class="glass-panel chart-wrapper" style="grid-column: span 2;">
+            <div class="chart-title">OPEX Burn Rate by Department (M01-M09 Heatmap)</div>
+            <div id="heatmapChart" class="chart-container"></div>
+        </div>
+    </div>
+
+    <script>
+        const sankeyChart = echarts.init(document.getElementById('sankeyChart'), 'dark');
+        const waterfallChart = echarts.init(document.getElementById('waterfallChart'), 'dark');
+        const heatmapChart = echarts.init(document.getElementById('heatmapChart'), 'dark');
+        
+        const transparentBg = { backgroundColor: 'transparent' };
+
+        // ==========================================
+        // 1. CASH FLOW SANKEY
+        // ==========================================
+        const sankeyData = {
+            nodes: [
+                {name: 'Gross Revenue', itemStyle: {color: '#3B82F6'}},
+                {name: 'COGS', itemStyle: {color: '#EF4444'}},
+                {name: 'Gross Profit', itemStyle: {color: '#10B981'}},
+                {name: 'R&D', itemStyle: {color: '#F59E0B'}},
+                {name: 'S&M', itemStyle: {color: '#8B5CF6'}},
+                {name: 'G&A', itemStyle: {color: '#6366F1'}},
+                {name: 'EBITDA', itemStyle: {color: '#10B981'}}
+            ],
+            links: [
+                {source: 'Gross Revenue', target: 'COGS', value: 9.4},
+                {source: 'Gross Revenue', target: 'Gross Profit', value: 15.4},
+                {source: 'Gross Profit', target: 'R&D', value: 4.2},
+                {source: 'Gross Profit', target: 'S&M', value: 3.5},
+                {source: 'Gross Profit', target: 'G&A', value: 2.5},
+                {source: 'Gross Profit', target: 'EBITDA', value: 5.2}
+            ]
+        };
+
+        sankeyChart.setOption({
+            ...transparentBg,
+            tooltip: { trigger: 'item', triggerOn: 'mousemove', formatter: '{b}: M' },
+            series: [{
+                type: 'sankey',
+                layout: 'none',
+                nodeAlign: 'left',
+                data: sankeyData.nodes,
+                links: sankeyData.links,
+                lineStyle: { color: 'source', curveness: 0.5, opacity: 0.3 },
+                label: { color: '#F9FAFB', fontFamily: 'Inter', fontSize: 11, formatter: '{b}\nM' },
+                itemStyle: { borderWidth: 0 }
+            }]
+        });
+
+        // ==========================================
+        // 2. EBITDA VARIANCE WATERFALL
+        // ==========================================
+        // Data: Base Budget(5.0), Vol(+1.5), Price(-0.8), FX(-0.5), Actual(5.2)
+        const base = [0, 5.0, 5.0, 5.2, 0]; 
+        const increase = [5.0, 1.5, '-', '-', 5.2];
+        const decrease = ['-', '-', 0.8, 0.5, '-'];
+        
+        waterfallChart.setOption({
+            ...transparentBg,
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+            grid: { left: '3%', right: '4%', bottom: '5%', containLabel: true },
+            xAxis: {
+                type: 'category',
+                splitLine: { show: false },
+                data: ['Budget', 'Volume', 'Price', 'FX', 'Actual'],
+                axisLabel: { color: '#9CA3AF', fontFamily: 'Inter', fontSize: 11 },
+                axisLine: { lineStyle: { color: '#374151' } }
+            },
+            yAxis: { 
+                type: 'value', 
+                axisLabel: { formatter: '$\M', color: '#9CA3AF', fontFamily: 'Fira Code' }, 
+                splitLine: { lineStyle: { color: '#1F2937', type: 'dashed' } } 
+            },
+            series: [
+                { name: 'Placeholder', type: 'bar', stack: 'Total', itemStyle: { borderColor: 'transparent', color: 'transparent' }, data: base },
+                { name: 'Favorable', type: 'bar', stack: 'Total', label: { show: true, position: 'top', color: '#10B981', fontFamily: 'Fira Code' }, itemStyle: { color: '#10B981' }, data: increase },
+                { name: 'Unfavorable', type: 'bar', stack: 'Total', label: { show: true, position: 'bottom', color: '#EF4444', fontFamily: 'Fira Code' }, itemStyle: { color: '#EF4444' }, data: decrease }
+            ]
+        });
+
+        // ==========================================
+        // 3. OPEX HEATMAP (Burn Rate)
+        // ==========================================
+        const depts = ['R&D', 'Sales', 'Marketing', 'G&A'];
+        const mths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'];
+        // Data [X(Month), Y(Dept), Value()]
+        const heatData = [
+            [0,0,300], [1,0,320], [2,0,310], [3,0,350], [4,0,380], [5,0,400], [6,0,450], [7,0,480], [8,0,510],
+            [0,1,200], [1,1,210], [2,1,250], [3,1,260], [4,1,260], [5,1,270], [6,1,280], [7,1,290], [8,1,300],
+            [0,2,150], [1,2,140], [2,2,160], [3,2,150], [4,2,170], [5,2,160], [6,2,200], [7,2,220], [8,2,400], // Mktg Spike in Sep
+            [0,3,100], [1,3,100], [2,3,110], [3,3,105], [4,3,115], [5,3,110], [6,3,120], [7,3,125], [8,3,130]
+        ];
+
+        heatmapChart.setOption({
+            ...transparentBg,
+            tooltip: { position: 'top', formatter: (p) => depts[p.value[1]] + ' in ' + mths[p.value[0]] + ':<br/>$' + p.value[2] + 'k' },
+            grid: { top: '5%', bottom: '15%', left: '8%', right: '5%' },
+            xAxis: { type: 'category', data: mths, splitArea: { show: true }, axisLine: {show: false}, axisLabel: {color: '#9CA3AF', fontFamily: 'Inter'} },
+            yAxis: { type: 'category', data: depts, splitArea: { show: true }, axisLine: {show: false}, axisLabel: {color: '#9CA3AF', fontFamily: 'Inter'} },
+            visualMap: {
+                min: 100, max: 500, calculable: true, orient: 'horizontal', left: 'center', bottom: -10,
+                inRange: { color: ['#111827', '#3B82F6', '#F59E0B', '#EF4444'] },
+                textStyle: { color: '#9CA3AF' }
+            },
+            series: [{
+                name: 'OPEX', type: 'heatmap', data: heatData,
+                label: { show: true, color: '#F9FAFB', fontFamily: 'Fira Code', fontSize: 10, formatter: (p) => '$' + p.value[2] + 'k' },
+                itemStyle: { borderColor: '#111827', borderWidth: 2 }
+            }]
+        });
+
+        window.addEventListener('resize', () => { 
+            sankeyChart.resize(); 
+            waterfallChart.resize(); 
+            heatmapChart.resize(); 
+        });
+    </script>
+</body>
+</html>

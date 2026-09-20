@@ -1,0 +1,306 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Sales & Profitability</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+        
+        :root {
+            --bg-base: #0F172A; /* Corporate Slate Dark */
+            --bg-panel: #1E293B;
+            --border: #334155;
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            
+            /* Restrained Semantic Colors */
+            --primary: #38BDF8; /* Sky Blue */
+            --positive: #10B981; /* Emerald */
+            --negative: #F43F5E; /* Rose */
+            --warning: #F59E0B; /* Amber */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg-base); color: var(--text-main); font-family: 'Inter', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+        /* HEADER & FILTER BAR */
+        .header { height: 64px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; background: var(--bg-panel); z-index: 40; }
+        .title-block { display: flex; flex-direction: column; }
+        .title-block h1 { font-size: 16px; font-weight: 600; letter-spacing: 0.5px; }
+        .title-block span { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono'; }
+        
+        .btn-filter { background: var(--primary); color: #0F172A; border: none; padding: 6px 14px; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-filter:hover { opacity: 0.9; }
+
+        /* FILTER CHIPS (Rule 8) */
+        .filter-chips { padding: 8px 24px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; align-items: center; background: rgba(30, 41, 59, 0.5); }
+        .chip { background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); color: var(--primary); padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+        .chip span { cursor: pointer; opacity: 0.7; } .chip span:hover { opacity: 1; }
+        .btn-clear { background: none; border: none; color: var(--text-muted); font-size: 11px; cursor: pointer; margin-left: auto; }
+
+        /* DASHBOARD GRID */
+        .scroll-area { flex: 1; overflow-y: auto; padding: 24px; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; grid-auto-rows: minmax(100px, auto); }
+        
+        .panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 8px; padding: 16px; display: flex; flex-direction: column; }
+        .span-2 { grid-column: span 2; } .span-4 { grid-column: span 4; } .span-6 { grid-column: span 6; } .span-8 { grid-column: span 8; } .span-12 { grid-column: span 12; }
+        .row-span-2 { grid-row: span 2; } .row-span-3 { grid-row: span 3; }
+
+        /* KPIs */
+        .kpi-title { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;}
+        .kpi-value { font-size: 24px; font-weight: 700; font-family: 'JetBrains Mono'; margin-bottom: 4px; }
+        .kpi-delta { font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 4px; }
+        .pos { color: var(--positive); } .neg { color: var(--negative); }
+        
+        /* CHARTS */
+        .chart-header { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        .chart-container { flex: 1; min-height: 280px; width: 100%; }
+
+        /* AI EXCEPTION PANEL */
+        .ai-panel { background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.2); }
+        .ai-header { color: var(--primary); font-family: 'JetBrains Mono'; font-size: 12px; font-weight: 700; margin-bottom: 12px; }
+        .ai-bullet { font-size: 13px; line-height: 1.5; color: #E2E8F0; margin-bottom: 12px; padding-left: 12px; border-left: 2px solid var(--border); }
+        .ai-bullet strong { color: #fff; }
+
+        /* DETAIL TABLE */
+        .data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+        .data-table th { padding: 10px; border-bottom: 1px solid var(--border); color: var(--text-muted); font-weight: 500; }
+        .data-table td { padding: 10px; border-bottom: 1px solid rgba(51, 65, 85, 0.5); font-family: 'JetBrains Mono'; }
+        .data-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        /* FILTER DRAWER */
+        .drawer { position: absolute; top: 0; right: -350px; width: 320px; height: 100%; background: var(--bg-panel); border-left: 1px solid var(--border); z-index: 100; transition: 0.3s; display: flex; flex-direction: column; box-shadow: -5px 0 20px rgba(0,0,0,0.5); }
+        .drawer.open { right: 0; }
+        .drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-weight: 600; }
+        .drawer-body { padding: 20px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        .drawer-footer { padding: 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+        .btn-apply { flex: 1; background: var(--primary); color: #0F172A; border: none; padding: 8px; border-radius: 4px; font-weight: 600; cursor: pointer; }
+
+        /* Controls */
+        .control-label { font-size: 12px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; display: block; }
+        .select-input, .search-input { width: 100%; background: var(--bg-base); border: 1px solid var(--border); color: #fff; padding: 8px; border-radius: 4px; font-size: 12px; outline: none; }
+        
+        .radio-group { display: flex; background: var(--bg-base); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+        .radio-group div { flex: 1; text-align: center; padding: 6px 0; font-size: 11px; font-weight: 500; cursor: pointer; color: var(--text-muted); }
+        .radio-group div.active { background: var(--primary); color: #0F172A; }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="title-block">
+            <h1>EXECUTIVE SALES & PROFITABILITY</h1>
+            <span>MULTI-REGION CONSOLIDATED | YTD 2026</span>
+        </div>
+        <button class="btn-filter" id="btnFilter">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+            Filters (2)
+        </button>
+    </div>
+
+    <!-- FILTER CHIPS -->
+    <div class="filter-chips">
+        <span style="font-size:11px; color:var(--text-muted);">Active Filters:</span>
+        <div class="chip">Period: YTD <span onclick="alert('remove')">×</span></div>
+        <div class="chip">Channel: B2B Enterprise <span onclick="alert('remove')">×</span></div>
+        <button class="btn-clear">Clear All</button>
+    </div>
+
+    <div class="scroll-area">
+        <div class="dashboard-grid">
+            
+            <!-- ROW 1: KPIs -->
+            <div class="panel span-2"><div class="kpi-title">Gross Revenue</div><div class="kpi-value">.8M</div><div class="kpi-delta pos">▲ 14.2% YoY</div></div>
+            <div class="panel span-2"><div class="kpi-title">Rev Growth (MoM)</div><div class="kpi-value">+3.4%</div><div class="kpi-delta pos">▲ 0.8% pts</div></div>
+            <div class="panel span-2"><div class="kpi-title">Net Profit</div><div class="kpi-value">.1M</div><div class="kpi-delta neg">▼ -2.1% YoY</div></div>
+            <div class="panel span-2"><div class="kpi-title">Profit Margin</div><div class="kpi-value">14.2%</div><div class="kpi-delta neg">▼ -2.4% pts</div></div>
+            <div class="panel span-2"><div class="kpi-title">Total Orders</div><div class="kpi-value">124k</div><div class="kpi-delta pos">▲ 18.5% YoY</div></div>
+            <div class="panel span-2"><div class="kpi-title">Avg Order Val</div><div class="kpi-value"></div><div class="kpi-delta neg">▼ -4.3% YoY</div></div>
+
+            <!-- ROW 2: TREND & INSIGHTS -->
+            <div class="panel span-8 row-span-2">
+                <div class="chart-header">Revenue vs Profit Trend (Trailing 12M) 
+                    <span style="font-size: 11px; font-weight: normal; color:var(--text-muted);">Grain: Monthly</span>
+                </div>
+                <div id="chartTrend" class="chart-container"></div>
+            </div>
+
+            <div class="panel span-4 row-span-2 ai-panel">
+                <div class="ai-header">EXECUTIVE EXCEPTIONS (AI DETECTED)</div>
+                <div class="ai-bullet"><strong>⚠️ The Growth Illusion:</strong> Revenue grew 14.2% YoY, but Net Profit shrank 2.1%. Top-line growth is currently destroying margin efficiency.</div>
+                <div class="ai-bullet"><strong>📍 Regional Anomaly (APAC):</strong> APAC drove 40% of the revenue growth but has a catastrophic 4.2% profit margin due to aggressive market-entry discounting.</div>
+                <div class="ai-bullet"><strong>📦 Product Driver:</strong> 'Enterprise Servers' (Subcategory) drove  in volume but generated negative profit (-) due to supply chain cost spikes.</div>
+            </div>
+
+            <!-- ROW 3: DRIVERS & PARADOX -->
+            <div class="panel span-4 row-span-2">
+                <div class="chart-header">Regional Contribution (Rev vs Margin)</div>
+                <div id="chartRegion" class="chart-container"></div>
+            </div>
+
+            <div class="panel span-8 row-span-2">
+                <div class="chart-header">Revenue vs Profitability Paradox (Subcategory)
+                    <span style="font-size: 11px; font-weight: normal; color:var(--text-muted);">Quadrant Analysis</span>
+                </div>
+                <div id="chartScatter" class="chart-container"></div>
+            </div>
+
+            <!-- ROW 4: DETAIL TABLE -->
+            <div class="panel span-12">
+                <div class="chart-header">Subcategory Financial Breakdown (Sorted by Revenue)</div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Subcategory</th>
+                            <th>Region</th>
+                            <th>Revenue</th>
+                            <th>Cost</th>
+                            <th>Net Profit</th>
+                            <th>Margin %</th>
+                            <th>YoY Growth</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Enterprise Servers</td><td>APAC</td><td>,450,000</td><td>,850,000</td><td class="neg">-,000</td><td class="neg">-3.2%</td><td class="pos">+45%</td></tr>
+                        <tr><td>Cloud Licenses</td><td>NA</td><td>,200,000</td><td>,100,000</td><td class="pos">,100,000</td><td class="pos">74.3%</td><td class="pos">+12%</td></tr>
+                        <tr><td>Networking Gear</td><td>EMEA</td><td>,400,000</td><td>,000,000</td><td class="pos">,400,000</td><td class="pos">25.9%</td><td class="neg">-4%</td></tr>
+                        <tr><td>Security Software</td><td>LATAM</td><td>,100,000</td><td>,000</td><td class="pos">,500,000</td><td class="pos">80.6%</td><td class="pos">+28%</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- FILTER DRAWER -->
+    <div class="drawer" id="drawer">
+        <div class="drawer-header">Global Filters <span style="cursor:pointer;" id="btnClose">×</span></div>
+        <div class="drawer-body">
+            
+            <div>
+                <span class="control-label">Date Range (Smart Preset)</span>
+                <div class="radio-group">
+                    <div>QTD</div>
+                    <div class="active">YTD</div>
+                    <div>Last 12M</div>
+                </div>
+            </div>
+
+            <div>
+                <span class="control-label">Channel (Low Cardinality)</span>
+                <div class="radio-group">
+                    <div class="active">B2B</div>
+                    <div>Retail</div>
+                    <div>E-Comm</div>
+                </div>
+            </div>
+
+            <div>
+                <span class="control-label">Region (Medium Cardinality)</span>
+                <select class="select-input">
+                    <option>All Regions</option>
+                    <option>North America (NA)</option>
+                    <option>Europe (EMEA)</option>
+                    <option>Asia Pacific (APAC)</option>
+                    <option>Latin America (LATAM)</option>
+                </select>
+            </div>
+
+            <div>
+                <span class="control-label">Category (Dependent Filter)</span>
+                <input type="text" class="search-input" placeholder="Search categories...">
+            </div>
+
+        </div>
+        <div class="drawer-footer">
+            <button class="btn-apply" style="background:transparent; border:1px solid var(--border); color:var(--text-main);" onclick="alert('Reset')">Reset</button>
+            <button class="btn-apply" onclick="document.getElementById('drawer').classList.remove('open')">Apply Filters</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('btnFilter').onclick = () => document.getElementById('drawer').classList.add('open');
+        document.getElementById('btnClose').onclick = () => document.getElementById('drawer').classList.remove('open');
+
+        const cTrend = echarts.init(document.getElementById('chartTrend'));
+        const cRegion = echarts.init(document.getElementById('chartRegion'));
+        const cScatter = echarts.init(document.getElementById('chartScatter'));
+
+        const font = 'Inter';
+        const txtColor = '#94A3B8';
+
+        // 1. TREND CHART (Dual Axis Area)
+        cTrend.setOption({
+            tooltip: { trigger: 'axis' },
+            legend: { data: ['Revenue ()', 'Profit ()'], textStyle: {color: txtColor, fontFamily: font}, top: 0 },
+            grid: { left: '3%', right: '3%', bottom: '5%', top: '15%', containLabel: true },
+            xAxis: { type: 'category', data: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], axisLabel: {color: txtColor} },
+            yAxis: [
+                { type: 'value', splitLine: {lineStyle: {color: '#334155'}}, axisLabel: {color: txtColor, fontFamily: 'JetBrains Mono'} },
+                { type: 'value', splitLine: {show: false}, axisLabel: {color: txtColor, fontFamily: 'JetBrains Mono'} }
+            ],
+            series: [
+                { name: 'Revenue ()', type: 'line', smooth: true, yAxisIndex: 0,
+                  itemStyle: { color: '#38BDF8' }, areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1, [{offset:0, color:'rgba(56,189,248,0.3)'}, {offset:1, color:'transparent'}]) },
+                  data: [2.1, 2.5, 2.8, 3.2, 3.5, 3.4, 3.8, 4.2, 4.5, 4.1, 4.8, 5.2] // Growing
+                },
+                { name: 'Profit ()', type: 'line', smooth: true, yAxisIndex: 1,
+                  itemStyle: { color: '#10B981' }, areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1, [{offset:0, color:'rgba(16,185,129,0.3)'}, {offset:1, color:'transparent'}]) },
+                  data: [0.5, 0.6, 0.7, 0.8, 0.8, 0.7, 0.7, 0.6, 0.5, 0.4, 0.4, 0.3] // Declining (The Illusion)
+                }
+            ]
+        });
+
+        // 2. REGION BAR (Sorted by Rev, Colored by Margin)
+        cRegion.setOption({
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+            grid: { left: '3%', right: '10%', bottom: '5%', top: '5%', containLabel: true },
+            xAxis: { type: 'value', show: false },
+            yAxis: { type: 'category', data: ['LATAM', 'EMEA', 'NA', 'APAC'], axisLabel: {color: txtColor}, axisLine: {show:false}, axisTick: {show:false} },
+            series: [{
+                type: 'bar',
+                data: [
+                    { value: 4.5, itemStyle: {color: '#10B981'} }, // High margin
+                    { value: 8.2, itemStyle: {color: '#38BDF8'} }, // Ok margin
+                    { value: 12.5, itemStyle: {color: '#38BDF8'} },
+                    { value: 17.6, itemStyle: {color: '#F43F5E'} }  // APAC: High rev, terrible margin
+                ],
+                label: { show: true, position: 'right', color: txtColor, formatter: 'M', fontFamily: 'JetBrains Mono' }
+            }]
+        });
+
+        // 3. QUADRANT SCATTER (Revenue vs Margin Paradox)
+        // Data: [Rev, Margin%, Size(Orders), Name]
+        const scatterData = [
+            [12.4, -3.2, 1200, 'Enterprise Servers'], [8.2, 74.3, 800, 'Cloud Licenses'],
+            [5.4, 25.9, 1500, 'Networking'], [3.1, 80.6, 400, 'Security Software'],
+            [2.1, -15.4, 300, 'Legacy Hardware'], [6.5, 12.4, 2000, 'Support Contracts'],
+            [4.2, 45.1, 600, 'Analytics API'], [1.8, 5.2, 900, 'Training Services']
+        ];
+        
+        cScatter.setOption({
+            tooltip: { formatter: (p) => ${p.data[3]}<br/>Rev: {p.data[0]}M<br/>Margin: % },
+            grid: { left: '5%', right: '5%', bottom: '10%', top: '10%', containLabel: true },
+            xAxis: { name: 'Revenue ()', nameLocation: 'middle', nameGap: 25, type: 'value', axisLabel: {color: txtColor, fontFamily: 'JetBrains Mono'}, splitLine: {lineStyle: {color: '#334155'}} },
+            yAxis: { name: 'Net Margin (%)', nameLocation: 'middle', nameGap: 30, type: 'value', axisLabel: {color: txtColor, fontFamily: 'JetBrains Mono'}, splitLine: {lineStyle: {color: '#334155', type:'dashed'}} },
+            series: [{
+                type: 'scatter',
+                data: scatterData,
+                symbolSize: (data) => Math.sqrt(data[2]) * 1.5,
+                itemStyle: { color: (params) => params.data[1] < 0 ? '#F43F5E' : (params.data[1] > 40 ? '#10B981' : '#38BDF8'), opacity: 0.8, borderColor: '#0F172A', borderWidth: 1 },
+                markLine: {
+                    symbol: ['none', 'none'],
+                    label: { show: false },
+                    lineStyle: { color: '#94A3B8', type: 'dashed', width: 1 },
+                    data: [ { xAxis: 5 }, { yAxis: 20 } ] // Quadrant dividers
+                }
+            }]
+        });
+
+        window.addEventListener('resize', () => { cTrend.resize(); cRegion.resize(); cScatter.resize(); });
+    </script>
+</body>
+</html>

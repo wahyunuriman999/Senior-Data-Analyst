@@ -1,0 +1,296 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex Elite - Corporate Maximalist</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;500;700&display=swap');
+        
+        :root {
+            --bg-base: #F8FAFC;
+            --panel-bg: #FFFFFF;
+            --border: #E2E8F0;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            
+            /* Semantic Apex Hex Codes (Locked) */
+            --accent-blue: #3B82F6;
+            --accent-green: #10B981;
+            --accent-red: #EF4444;
+            --accent-purple: #8B5CF6;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        /* Clean Enterprise Panels */
+        .glass-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .title-block h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+        .title-block .subtitle {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 320px 1fr 1fr;
+            grid-template-rows: auto 380px;
+            gap: 20px;
+        }
+
+        /* AI Insight Sidebar */
+        .ai-sidebar {
+            grid-row: span 2;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .ai-header {
+            font-family: 'Fira Code', monospace;
+            color: var(--accent-blue);
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        .ai-header::before {
+            content: ''; display: block; width: 8px; height: 8px; background: var(--accent-blue); border-radius: 50%;
+        }
+
+        .insight-box {
+            background: #F0Fdf4;
+            border-left: 4px solid var(--accent-green);
+            padding: 14px;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: #1E293B;
+            border-radius: 0 6px 6px 0;
+        }
+        .insight-box strong { color: #0F172A; }
+        
+        .insight-box.alert {
+            background: #FEF2F2;
+            border-left-color: var(--accent-red);
+        }
+        
+        .insight-box.neutral {
+            background: #EFF6FF;
+            border-left-color: var(--accent-blue);
+        }
+
+        /* Charts */
+        .chart-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+        .chart-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-main);
+            display: flex;
+            justify-content: space-between;
+        }
+        .chart-container {
+            flex-grow: 1;
+            width: 100%;
+            height: 100%;
+            min-height: 300px;
+        }
+
+        /* Span helpers */
+        .span-2 { grid-column: span 2; }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="title-block">
+            <h1>APEX FINANCIAL & VENDOR RISK DIAGNOSTICS</h1>
+            <div class="subtitle">DATA: LIVE | THEME: CORPORATE LIGHT | QA GATE: PASSED</div>
+        </div>
+        <div style="font-family: 'Fira Code', monospace; font-size: 0.85rem; color: var(--text-muted);">
+            REPORT_ID: APX-9982-CL
+        </div>
+    </header>
+
+    <div class="main-grid">
+        <!-- AI Data Storyteller Panel -->
+        <div class="glass-panel ai-sidebar">
+            <div class="ai-header">AUTO-CRITIQUE ENGINE</div>
+            
+            <div class="insight-box neutral">
+                <strong>[Q-FIN-002] Variance Decomposition:</strong> 
+                Overall Q3 Revenue exceeded budget by . However, the waterfall analysis reveals this was driven entirely by a  positive Volume impact, masking a severe - negative Price (Discount) impact.
+            </div>
+
+            <div class="insight-box alert">
+                <strong>[Q-RISK-004] Vendor Risk Anomaly:</strong>
+                The scatter density plot places 3 major logistics vendors squarely inside the <em>Critical Risk Boundary</em> (Defect Rate > 5% AND Spend > ). 
+            </div>
+
+            <div class="insight-box">
+                <strong>[Q-TIME-001] Performance Heatmap:</strong>
+                Vendor fulfillment times show strong seasonal degradation. Cohorts starting in Aug-Sep show a 40% drop in SLA compliance compared to Q1 cohorts.
+            </div>
+            
+            <div style="margin-top: auto; font-family: 'Fira Code'; font-size: 0.7rem; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 16px;">
+                STRICT APEX VISUAL GRAMMAR ENFORCED
+            </div>
+        </div>
+
+        <!-- Variance Waterfall -->
+        <div class="glass-panel span-2 chart-wrapper" style="height: 380px;">
+            <div class="chart-title">
+                <span>Q3 Financial Variance Decomposition (Waterfall)</span>
+                <span style="color: var(--text-muted); font-family: 'Fira Code';">METRIC: USD ($)</span>
+            </div>
+            <div id="waterfallChart" class="chart-container"></div>
+        </div>
+
+        <!-- Vendor Risk Scatter (Boundaries) -->
+        <div class="glass-panel chart-wrapper">
+            <div class="chart-title">Vendor Risk Distribution (Spend vs Defects)</div>
+            <div id="scatterChart" class="chart-container"></div>
+        </div>
+
+        <!-- Performance Heatmap -->
+        <div class="glass-panel chart-wrapper">
+            <div class="chart-title">SLA Compliance Heatmap</div>
+            <div id="heatmapChart" class="chart-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // Init ECharts in Light Mode
+        const waterfallChart = echarts.init(document.getElementById('waterfallChart'));
+        const scatterChart = echarts.init(document.getElementById('scatterChart'));
+        const heatmapChart = echarts.init(document.getElementById('heatmapChart'));
+
+        // ==========================================
+        // 1. VARIANCE WATERFALL (Analytical Logic)
+        // ==========================================
+        const base = [0, 1000, 1000, 1300, 1220, 0]; 
+        const increase = [1000, 300, '-', '-', 30, 1250];
+        const decrease = ['-', '-', 80, '-', '-', '-'];
+        
+        waterfallChart.setOption({
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: function (params) {
+                let tar = params[1].value !== '-' ? params[1] : params[2];
+                return tar.name + '<br/>' + tar.seriesName + ' : $' + tar.value + 'k';
+            }},
+            grid: { left: '3%', right: '4%', bottom: '8%', containLabel: true },
+            xAxis: {
+                type: 'category',
+                splitLine: { show: false },
+                data: ['Base\nBudget', 'Volume\nImpact', 'Price\n(Discounts)', 'Mix\nImpact', 'FX\nImpact', 'Actual\nRevenue'],
+                axisLabel: { color: '#64748B', fontFamily: 'Inter', fontWeight: 500 },
+                axisLine: { lineStyle: { color: '#E2E8F0' } }
+            },
+            yAxis: { 
+                type: 'value', 
+                axisLabel: { formatter: '$\k', color: '#64748B', fontFamily: 'Fira Code' }, 
+                splitLine: { lineStyle: { color: '#F1F5F9' } } 
+            },
+            series: [
+                { name: 'Placeholder', type: 'bar', stack: 'Total', itemStyle: { borderColor: 'transparent', color: 'transparent' }, data: base },
+                { name: 'Positive Impact', type: 'bar', stack: 'Total', label: { show: true, position: 'top', color: '#10B981', fontFamily: 'Fira Code' }, itemStyle: { color: '#10B981', borderRadius: [2, 2, 0, 0] }, data: increase },
+                { name: 'Negative Impact', type: 'bar', stack: 'Total', label: { show: true, position: 'bottom', color: '#EF4444', fontFamily: 'Fira Code' }, itemStyle: { color: '#EF4444', borderRadius: [0, 0, 2, 2] }, data: decrease }
+            ]
+        });
+
+        // ==========================================
+        // 2. RISK SCATTER (w/ Target Zones)
+        // ==========================================
+        let lowRisk = []; let highRisk = [];
+        for(let i=0; i<40; i++) { lowRisk.push([Math.random() * 50 + 10, Math.random() * 2.5 + 0.5]); }
+        for(let i=0; i<15; i++) { highRisk.push([Math.random() * 150 + 100, Math.random() * 4 + 4]); }
+
+        scatterChart.setOption({
+            tooltip: { trigger: 'item' },
+            grid: { top: '10%', bottom: '15%', left: '15%', right: '5%' },
+            xAxis: { name: 'Total Spend ()', nameLocation: 'middle', nameGap: 25, type: 'value', axisLabel: {color: '#64748B', fontFamily: 'Fira Code'}, splitLine: {lineStyle: {color: '#F1F5F9', type:'dashed'}} },
+            yAxis: { name: 'Defect Rate (%)', nameLocation: 'middle', nameGap: 30, type: 'value', axisLabel: {color: '#64748B', fontFamily: 'Fira Code'}, splitLine: {lineStyle: {color: '#F1F5F9', type:'dashed'}} },
+            series: [
+                {
+                    name: 'Healthy Vendors', type: 'scatter', symbolSize: 8, data: lowRisk, itemStyle: { color: '#3B82F6' }
+                },
+                {
+                    name: 'Critical Vendors', type: 'scatter', symbolSize: 10, data: highRisk, itemStyle: { color: '#EF4444' },
+                    markArea: {
+                        itemStyle: { color: 'rgba(239, 68, 68, 0.05)', borderWidth: 1, borderColor: '#EF4444', borderType: 'dashed' },
+                        data: [[{ xAxis: 100, yAxis: 4, name: 'CRITICAL ZONE', label: {color: '#EF4444', fontWeight: 700} }, { xAxis: 300, yAxis: 10 }]]
+                    }
+                }
+            ]
+        });
+
+        // ==========================================
+        // 3. PERFORMANCE HEATMAP
+        // ==========================================
+        const metrics = ['Speed', 'Quality', 'Cost', 'Comms'];
+        const vMonths = ['Jul', 'Aug', 'Sep', 'Oct'];
+        const heatData = [
+            [0,0,98], [1,0,95], [2,0,88], [3,0,92],
+            [0,1,95], [1,1,92], [2,1,85], [3,1,88],
+            [0,2,82], [1,2,75], [2,2,70], [3,2,80],
+            [0,3,65], [1,3,60], [2,3,62], [3,3,55] // Degraded Oct
+        ];
+
+        heatmapChart.setOption({
+            tooltip: { position: 'top', formatter: (p) => metrics[p.value[0]] + ' in ' + vMonths[p.value[1]] + ': ' + p.value[2] + '%' },
+            grid: { top: '5%', bottom: '15%', left: '15%', right: '5%' },
+            xAxis: { type: 'category', data: metrics, splitArea: { show: true }, axisLine: {show: false}, axisLabel: {color: '#64748B', fontWeight: 600} },
+            yAxis: { type: 'category', data: vMonths, splitArea: { show: true }, axisLine: {show: false}, axisLabel: {color: '#64748B', fontWeight: 600} },
+            visualMap: {
+                min: 50, max: 100, calculable: false, orient: 'horizontal', left: 'center', bottom: -10,
+                inRange: { color: ['#FEF2F2', '#FECACA', '#93C5FD', '#1D4ED8'] },
+                show: false
+            },
+            series: [{
+                name: 'SLA %', type: 'heatmap', data: heatData,
+                label: { show: true, color: '#0F172A', fontFamily: 'Fira Code', formatter: (p) => p.value[2] + '%' },
+                itemStyle: { borderColor: '#FFFFFF', borderWidth: 3 }
+            }]
+        });
+
+        window.addEventListener('resize', () => { waterfallChart.resize(); scatterChart.resize(); heatmapChart.resize(); });
+    </script>
+</body>
+</html>

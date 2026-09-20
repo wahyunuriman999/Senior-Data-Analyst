@@ -1,0 +1,336 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex Elite - Filter Intelligence Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --bg-body: #030712;
+            --bg-sidebar: #0B1120;
+            --bg-panel: rgba(17, 24, 39, 0.7);
+            --border: rgba(55, 65, 81, 0.6);
+            --text-main: #F9FAFB;
+            --text-muted: #9CA3AF;
+            
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --green: #10B981;
+            --red: #EF4444;
+            --purple: #8B5CF6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg-body); color: var(--text-main); font-family: 'Inter', sans-serif; display: flex; height: 100vh; overflow: hidden; }
+
+        /* SIDEBAR (Main Nav) */
+        .sidebar { width: 80px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 24px 0; z-index: 50; }
+        .logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, var(--blue), var(--cyan)); border-radius: 8px; margin-bottom: 40px; box-shadow: 0 0 15px rgba(6,182,212,0.4); }
+        .nav-icon { width: 40px; height: 40px; border-radius: 8px; margin-bottom: 16px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; transition: 0.2s; font-family: 'Fira Code'; font-size: 18px;}
+        .nav-icon.active { background: rgba(59, 130, 246, 0.2); color: var(--blue); border: 1px solid var(--blue); }
+
+        /* MAIN DASHBOARD AREA */
+        .main-content { flex: 1; display: flex; flex-direction: column; position: relative; background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.05), transparent 60%); }
+        
+        /* HEADER & FILTER BAR */
+        .header { height: 70px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; background: rgba(3, 7, 18, 0.8); backdrop-filter: blur(12px); z-index: 40; }
+        .title { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 12px; }
+        
+        .filter-actions { display: flex; align-items: center; gap: 16px; }
+        .btn-filter { background: var(--blue); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+        .btn-filter:hover { background: #2563EB; }
+        
+        /* ACTIVE FILTER CHIPS (Rule 8) */
+        .filter-chips-bar { padding: 12px 32px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: center; background: rgba(11, 17, 32, 0.5); }
+        .chip-label { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-right: 8px; }
+        .chip { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: var(--blue); padding: 4px 10px; border-radius: 16px; font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+        .chip span { cursor: pointer; opacity: 0.7; } .chip span:hover { opacity: 1; }
+        .btn-clear { background: transparent; border: none; color: var(--text-muted); font-size: 12px; cursor: pointer; margin-left: auto; }
+        .btn-clear:hover { color: var(--text-main); text-decoration: underline; }
+
+        /* DASHBOARD GRID */
+        .dashboard-scroll { flex: 1; overflow-y: auto; padding: 24px 32px; position: relative; }
+        .bento-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; grid-auto-rows: minmax(140px, auto); }
+        .panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; backdrop-filter: blur(10px); position: relative; overflow: hidden; }
+        
+        .span-3 { grid-column: span 3; } .span-6 { grid-column: span 6; } .span-9 { grid-column: span 9; } .span-12 { grid-column: span 12; }
+        .row-span-2 { grid-row: span 2; }
+        
+        .kpi-title { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+        .kpi-val { font-size: 28px; font-weight: 700; font-family: 'Fira Code'; color: var(--text-main); }
+        
+        .chart-header { font-size: 14px; font-weight: 600; margin-bottom: 16px; display: flex; justify-content: space-between; }
+        .chart-container { flex: 1; min-height: 250px; }
+
+        /* RIGHT FILTER DRAWER (Rule 9) */
+        .filter-drawer { position: absolute; top: 0; right: -400px; width: 380px; height: 100%; background: #0B1120; border-left: 1px solid var(--border); z-index: 100; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.5); }
+        .filter-drawer.open { right: 0; }
+        .drawer-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .drawer-header h2 { font-size: 16px; font-weight: 600; }
+        .btn-close { background: transparent; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; }
+        .drawer-body { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
+        .drawer-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 12px; background: rgba(3,7,18,0.5); }
+        .btn-apply { flex: 1; background: var(--blue); color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .btn-reset { flex: 1; background: transparent; color: var(--text-main); border: 1px solid var(--border); padding: 10px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        
+        /* FILTER CONTROLS */
+        .filter-group { display: flex; flex-direction: column; gap: 10px; }
+        .filter-label { font-size: 13px; font-weight: 600; color: var(--text-main); }
+        .filter-hint { font-size: 11px; color: var(--text-muted); }
+        
+        /* Rule 2: Segmented Control (Low Cardinality) */
+        .segmented-control { display: flex; background: rgba(255,255,255,0.05); border-radius: 6px; padding: 4px; }
+        .seg-btn { flex: 1; text-align: center; padding: 6px 0; font-size: 12px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-radius: 4px; transition: 0.2s; }
+        .seg-btn.active { background: var(--blue); color: #fff; }
+
+        /* Rule 2: Searchable Dropdown (Medium/High Cardinality) */
+        .search-input { width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border); color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 13px; outline: none; }
+        .checkbox-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; max-height: 120px; overflow-y: auto; }
+        .checkbox-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); cursor: pointer; }
+        .checkbox-item input { accent-color: var(--blue); }
+
+        /* Rule 13: Empty State */
+        .empty-state { position: absolute; inset: 0; background: rgba(3, 7, 18, 0.95); z-index: 30; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; backdrop-filter: blur(4px); }
+        .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+        .empty-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+        .empty-desc { font-size: 14px; color: var(--text-muted); max-width: 300px; margin-bottom: 20px; line-height: 1.5; }
+        
+        /* LOADING OVERLAY (Rule 10) */
+        .loading-overlay { position: absolute; inset: 0; background: rgba(3, 7, 18, 0.8); z-index: 35; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .loader { width: 40px; height: 40px; border: 3px solid rgba(59, 130, 246, 0.2); border-top-color: var(--blue); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="logo-icon"></div>
+        <div class="nav-icon active">◱</div>
+        <div class="nav-icon">◠</div>
+        <div class="nav-icon">◳</div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="title">Apex Causal Analytics</div>
+            <div class="filter-actions">
+                <div style="font-size: 12px; color: var(--text-muted); font-family: 'Fira Code';">12,842 records</div>
+                <button class="btn-filter" id="btnOpenFilter">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                    Filters <span style="background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 10px; font-size: 11px;" id="filterCountBadge">3</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ACTIVE FILTER CHIPS -->
+        <div class="filter-chips-bar" id="chipsBar">
+            <div class="chip-label">Active Filters:</div>
+            <div class="chip" id="chipTime">Last 30 Days <span onclick="removeFilter('time')">×</span></div>
+            <div class="chip" id="chipSegment">Segment: Enterprise <span onclick="removeFilter('segment')">×</span></div>
+            <div class="chip" id="chipRegion">Region: APAC <span onclick="removeFilter('region')">×</span></div>
+            <button class="btn-clear" onclick="clearAll()">Clear All</button>
+        </div>
+
+        <!-- DASHBOARD SCROLL AREA -->
+        <div class="dashboard-scroll">
+            
+            <!-- EMPTY STATE (Rule 13 & 14) -->
+            <div class="empty-state" id="emptyState">
+                <div class="empty-icon">🕳️</div>
+                <div class="empty-title">Filter Conflict Detected</div>
+                <div class="empty-desc">No data matches the current combination. <br><br><span style="color:var(--red); font-family:'Fira Code';">Region "LATAM" has 0 sales in "Enterprise" segment.</span></div>
+                <button class="btn-reset" style="background:var(--blue); color:#fff; border:none; padding: 10px 20px; margin-top: 10px;" onclick="clearAll()">Reset Filters</button>
+            </div>
+
+            <!-- LOADING OVERLAY -->
+            <div class="loading-overlay" id="loadingOverlay"><div class="loader"></div></div>
+
+            <div class="bento-grid">
+                <!-- KPIs -->
+                <div class="panel span-3"><div class="kpi-title">Filtered Revenue</div><div class="kpi-val" id="kpiRev">.5M</div></div>
+                <div class="panel span-3"><div class="kpi-title">Margin (Recalculated)</div><div class="kpi-val" id="kpiMar" style="color: var(--red);">4.2%</div></div>
+                <div class="panel span-3"><div class="kpi-title">Avg Latency</div><div class="kpi-val">185ms</div></div>
+                <div class="panel span-3"><div class="kpi-title">Churn Probability</div><div class="kpi-val" style="color: var(--red);">15.2%</div></div>
+
+                <!-- CHARTS -->
+                <div class="panel span-6 row-span-2">
+                    <div class="chart-header">Revenue vs Margin Paradox (By Region) <span style="color:var(--purple); font-family:'Fira Code'; font-size:11px;">FILTERED</span></div>
+                    <div id="chartMain" class="chart-container"></div>
+                </div>
+
+                <div class="panel span-6">
+                    <div class="chart-header">Latency Outlier Distribution</div>
+                    <div id="chartScatter" class="chart-container"></div>
+                </div>
+
+                <!-- AI INSIGHT PANEL -->
+                <div class="panel span-6" style="background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.2);">
+                    <div class="chart-header" style="color: var(--red);">[!] AI DEPENDENCY WARNING</div>
+                    <div style="font-size: 13px; line-height: 1.6; color: #D1D5DB;">
+                        You have filtered by <strong>Segment = Enterprise</strong> and <strong>Region = APAC</strong>. 
+                        <br><br>
+                        This specific intersection triggers the <em>Margin Trap</em>. While volume remains high (.5M), the massive regional enterprise discounts drop the aggregate margin to 4.2%. 
+                        <br><br>
+                        <strong>Data Grain Integrity:</strong> Metric recalculation complete. <em>(SUM(Profit) / SUM(Revenue))</em>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT FILTER DRAWER PANEL (Rule 9) -->
+        <div class="filter-drawer" id="filterDrawer">
+            <div class="drawer-header">
+                <h2>Intelligent Filters</h2>
+                <button class="btn-close" id="btnCloseFilter">×</button>
+            </div>
+            
+            <div class="drawer-body">
+                
+                <!-- Rule 3: Smart Date Presets -->
+                <div class="filter-group">
+                    <div class="filter-label">Time Period</div>
+                    <div class="segmented-control">
+                        <div class="seg-btn">Last 7D</div>
+                        <div class="seg-btn active">Last 30D</div>
+                        <div class="seg-btn">YTD</div>
+                        <div class="seg-btn">Custom</div>
+                    </div>
+                </div>
+
+                <!-- Rule 2: Low Cardinality = Segmented -->
+                <div class="filter-group">
+                    <div class="filter-label">Customer Segment</div>
+                    <div class="filter-hint">Low cardinality (3 values)</div>
+                    <div class="segmented-control" id="segmentControl">
+                        <div class="seg-btn">SMB</div>
+                        <div class="seg-btn">Mid-Market</div>
+                        <div class="seg-btn active" data-val="Enterprise">Enterprise</div>
+                    </div>
+                </div>
+
+                <!-- Rule 2 & 6: Medium Cardinality + Search -->
+                <div class="filter-group">
+                    <div class="filter-label">Region (Cascading Dependency)</div>
+                    <div class="filter-hint">Available regions based on Segment</div>
+                    <input type="text" class="search-input" placeholder="Search regions...">
+                    <div class="checkbox-list">
+                        <label class="checkbox-item"><input type="checkbox" checked id="chkAPAC"> APAC</label>
+                        <label class="checkbox-item"><input type="checkbox"> EMEA</label>
+                        <label class="checkbox-item"><input type="checkbox"> NA</label>
+                        <label class="checkbox-item" id="lblLATAM"><input type="checkbox" id="chkLATAM"> LATAM</label>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="drawer-footer">
+                <button class="btn-reset" onclick="clearAll()">Reset</button>
+                <button class="btn-apply" id="btnApply">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Drawer Logic
+        const drawer = document.getElementById('filterDrawer');
+        document.getElementById('btnOpenFilter').onclick = () => drawer.classList.add('open');
+        document.getElementById('btnCloseFilter').onclick = () => drawer.classList.remove('open');
+
+        // Chart Initialization
+        const cMain = echarts.init(document.getElementById('chartMain'));
+        const cScatter = echarts.init(document.getElementById('chartScatter'));
+        
+        function renderCharts(isConflict = false) {
+            if(isConflict) return; // Charts are hidden by empty state overlay
+
+            cMain.setOption({
+                backgroundColor: 'transparent',
+                tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+                legend: { data: ['Volume', 'Margin %'], textStyle: {color: '#9CA3AF'}, bottom: 0 },
+                grid: { left: '3%', right: '3%', bottom: '15%', top: '5%', containLabel: true },
+                xAxis: { type: 'category', data: ['CN', 'JP', 'SG', 'IN'], axisLabel: {color: '#9CA3AF'} },
+                yAxis: [
+                    { type: 'value', splitLine: {lineStyle: {color: '#1F2937'}}, axisLabel: {color: '#9CA3AF'} },
+                    { type: 'value', splitLine: {show: false}, axisLabel: {color: '#9CA3AF'} }
+                ],
+                series: [
+                    { name: 'Volume', type: 'bar', barWidth: '40%', itemStyle: { color: '#3B82F6' }, data: [3.2, 2.1, 1.8, 1.4] },
+                    { name: 'Margin %', type: 'line', yAxisIndex: 1, itemStyle: { color: '#EF4444' }, lineStyle: {width:3}, data: [5, 4.2, 3.8, 3.5] }
+                ]
+            });
+
+            const scatterData = [];
+            for(let i=0; i<30; i++) scatterData.push([Math.random()*50 + 150, Math.random()*10 + 10]); // High latency cluster
+            
+            cScatter.setOption({
+                backgroundColor: 'transparent',
+                tooltip: { trigger: 'item' },
+                grid: { left: '3%', right: '5%', bottom: '5%', top: '5%', containLabel: true },
+                xAxis: { type: 'value', splitLine: {lineStyle: {color: '#1F2937'}} },
+                yAxis: { type: 'value', splitLine: {lineStyle: {color: '#1F2937', type:'dashed'}} },
+                series: [{
+                    type: 'scatter', data: scatterData, itemStyle: { color: '#EF4444' }, symbolSize: 10,
+                    markArea: { itemStyle: { color: 'rgba(239,68,68,0.1)' }, data: [[{ xAxis: 150 }, { xAxis: 250 }]] }
+                }]
+            });
+        }
+        
+        renderCharts();
+
+        // Apply Logic (Rule 10 & 14)
+        document.getElementById('btnApply').onclick = () => {
+            drawer.classList.remove('open');
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                
+                // Simulate Conflict Detection (Enterprise + LATAM = 0 rows)
+                const isLatam = document.getElementById('chkLATAM').checked;
+                if (isLatam) {
+                    document.getElementById('emptyState').style.display = 'flex';
+                    document.getElementById('chipsBar').style.display = 'flex';
+                    document.getElementById('chipRegion').innerHTML = 'Region: LATAM <span onclick="removeFilter(\'region\')">×</span>';
+                    document.getElementById('kpiRev').innerText = '';
+                    document.getElementById('kpiMar').innerText = '0%';
+                } else {
+                    document.getElementById('emptyState').style.display = 'none';
+                    renderCharts();
+                }
+            }, 800);
+        };
+
+        // Clear All Logic
+        window.clearAll = function() {
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('chipsBar').style.display = 'none';
+            document.getElementById('filterCountBadge').innerText = '0';
+            
+            // Reset UI
+            document.getElementById('chkLATAM').checked = false;
+            document.getElementById('chkAPAC').checked = false;
+            
+            // Mock reverting to default global view
+            document.getElementById('kpiRev').innerText = '.8M';
+            document.getElementById('kpiMar').innerText = '18.4%';
+            document.getElementById('kpiMar').style.color = 'var(--text-main)';
+            
+            renderCharts();
+        };
+
+        window.removeFilter = function(id) {
+            // Simplified mock for removing a chip
+            if(id === 'region') document.getElementById('chkLATAM').checked = false;
+            document.getElementById('btnApply').click(); // Re-apply
+        };
+
+        window.addEventListener('resize', () => { cMain.resize(); cScatter.resize(); });
+    </script>
+</body>
+</html>
