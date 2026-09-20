@@ -14,13 +14,13 @@
 
 ---
 
-## 📊 Example Dashboards (Reference Styles)
-The AI utilizes these architectural reference styles to programmatically generate dense, high-hierarchy analytical dashboards.
+## 🔥 Apex Generated Analytical Artifacts
+The AI utilizes deep reasoning, variance decomposition, and a strict semantic grammar engine to programmatically generate dense, high-hierarchy analytical UI.
 
 <p align="center">
-  <img src="assets/executive_sales_dashboard_1789830834883.jpg" width="32%" title="Modern SaaS Executive Sales" />
-  <img src="assets/financial_dashboard_1789830853037.jpg" width="32%" title="Corporate Financial Performance" />
-  <img src="assets/operational_dashboard_1789830870403.jpg" width="32%" title="Cinematic Operational Network" />
+  <img src="../assets/apex_executive.jpg" width="32%" title="Level 1: Executive C-Suite Dashboard" />
+  <img src="../assets/apex_analyst.jpg" width="32%" title="Level 2: Analyst Deep Dive & Cohorts" />
+  <img src="../assets/apex_operational.jpg" width="32%" title="Level 3: Real-Time Operational Monitoring" />
 </p>
 
 ---
