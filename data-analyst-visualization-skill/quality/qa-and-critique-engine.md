@@ -78,3 +78,15 @@ Learn from past systemic failures. When generating HTML Artifacts for the Antigr
 2. **THE EVENT LISTENER TRAP**: The IDE dynamically injects HTML strings. The DOMContentLoaded event HAS ALREADY FIRED by the time your script runs. NEVER wrap your initialization in document.addEventListener("DOMContentLoaded", ...). Use setTimeout(initFunction, 500) or execute it directly at the bottom of the body.
 3. **THE 0x0 CANVAS COLLAPSE**: ECharts will fail to render (blank grey box) if it is initialized inside a CSS Grid / Flexbox container that relies purely on lex: 1 or % height without a defined pixel height at runtime. You MUST hardcode a fallback height (e.g., .chart-container { height: 320px; width: 100%; }).
 4. **THE POWERSHELL $ ASSASSIN**: Never use double-quoted strings (@"..."@) in PowerShell to write HTML/JS files if they contain dollar signs (like $42M or JS template literals ${c}). PowerShell will evaluate them as null variables and delete them, causing JS Syntax Errors. Always use Python write() or single-quoted here-strings (@'...'@).
+### 🚨 Q-VIS-ANALYTICAL: THE SINGLE SOURCE OF TRUTH (SSOT) & INVARIANT RECONCILIATION
+Never build a "Hollywood Set" dashboard (where numbers look good but are hardcoded and disconnected).
+1. **SINGLE SOURCE OF TRUTH (SSOT)**: All KPIs, Charts, and Text Insights MUST be calculated dynamically from a single underlying data array (awCustomerData). Do NOT use decoupled arrays for different charts.
+2. **INVARIANT RECONCILIATION**:
+   - Math must prove itself. If Waterfall shows Beg MRR ,500, Expansion , Contraction -, Churn -, then NRR **MUST** be explicitly calculated in JS as (Beg + Exp - Cont - Churn) / Beg.
+   - Never hardcode NRR = 108.4% while the underlying chart data calculates to 104%. 
+   - Logo Churn vs Revenue Churn must reconcile with the base data.
+3. **NARRATIVE INTEGRITY**: AI Insights must be deterministic functions of the data state, not hallucinations. 
+   - Wrong: "Losing one will tank NRR" (Hallucination/Forecast disguised as fact).
+   - Right: "Scenario: Loss of top customer would reduce starting MRR by X%."
+4. **FILTER ENGINE REALITY**: Filters must run a .filter() on the SSOT array and trigger a complete recalculation of ALL metrics, waterfall steps, Pareto curves, and AI narratives.
+5. **EXPLICIT RISK RULES**: If labeling a customer "High Risk", the UI must explicitly state the rule (e.g., Risk Rule: Usage Drop > 40% AND Tickets > 5).

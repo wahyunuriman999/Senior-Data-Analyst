@@ -76,3 +76,5 @@ To prevent blank charts and broken UI, you MUST follow these technical constrain
 2. **ECHARTS RENDERING SAFEGUARD**: NEVER rely on lex: 1 or height: 100% alone for ECharts containers. You MUST provide a hardcoded pixel fallback (e.g., height: 300px; width: 100%;). ECharts will fail to render (0x0 canvas) if the parent grid container does not have explicit dimensions at the exact millisecond of initialization.
 ## 🚨 CRITICAL SURVIVAL RULES (LEARNED FROM FAILURES)
 Always reference quality/qa-and-critique-engine.md (Section Q-VIS-FATAL) before generating any HTML artifacts. You must bypass the IDE's CSP, avoid the DOMContentLoaded trap, secure ECharts dimensions, and prevent PowerShell string corruption.
+## 🚨 ANALYTICAL INVARIANT PROTOCOL
+Dashboards are Decision Systems, not paintings. You must guarantee Metric Reconciliation (e.g., NRR matches Waterfall math exactly) and implement a True Filter Engine using a Single Source of Truth array. Reference Q-VIS-ANALYTICAL in the QA engine.
