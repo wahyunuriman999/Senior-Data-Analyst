@@ -14,14 +14,38 @@
 
 ---
 
-## 🔥 Apex Generated Analytical Artifacts
-The AI utilizes deep reasoning, variance decomposition, and a strict semantic grammar engine to programmatically generate dense, high-hierarchy analytical UI.
+## 🔥 10 Apex Generated Analytical Artifacts
+The AI utilizes deep reasoning, variance decomposition, and a strict semantic grammar engine to programmatically generate dense, high-hierarchy analytical UI. Below are 10 examples of what the Apex Data Analyst Skill can generate natively.
 
-<p align="center">
-  <img src="assets/apex_executive.jpg" width="32%" title="Level 1: Executive C-Suite Dashboard" />
-  <img src="assets/apex_analyst.jpg" width="32%" title="Level 2: Analyst Deep Dive & Cohorts" />
-  <img src="assets/apex_operational.jpg" width="32%" title="Level 3: Real-Time Operational Monitoring" />
-</p>
+### 1. Dashboard Corporate Finance (Variance Decomposition)
+![Dashboard Finance](assets/dash_finance.jpg)
+
+### 2. Dashboard Executive Sales & Forecasting
+![Dashboard Sales](assets/dash_sales.jpg)
+
+### 3. Dashboard Marketing (Cohort & Funnel Analytics)
+![Dashboard Marketing](assets/dash_marketing.jpg)
+
+### 4. Dashboard Logistics & Supply Chain
+![Dashboard Logistics](assets/dash_logistics.jpg)
+
+### 5. Dashboard Product Engagement (Density Hexbins)
+![Dashboard Product](assets/dash_product.jpg)
+
+### 6. Dashboard HR & People Analytics
+![Dashboard HR](assets/dash_hr.jpg)
+
+### 7. Dashboard E-Commerce (Market Basket Association)
+![Dashboard E-Commerce](assets/dash_ecommerce.jpg)
+
+### 8. Dashboard Risk Management (Statistical Confidence)
+![Dashboard Risk](assets/dash_risk.jpg)
+
+### 9. Dashboard Healthcare Patient Flow (Sankey Diagram)
+![Dashboard Health](assets/dash_health.jpg)
+
+### 10. Dashboard Operational Network (Real-time Anomaly)
+![Dashboard Operational](assets/apex_operational.jpg)
 
 ---
 
