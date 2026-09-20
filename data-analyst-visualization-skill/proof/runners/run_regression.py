@@ -1,4 +1,4 @@
-import os
+﻿import os
 import sys
 import re
 
@@ -19,22 +19,22 @@ fixtures = [
     "null_revenue.csv", "orders.csv", "order_tags.csv",
     "pie_18_categories.csv", "time_series.csv"
 ]
-fixture_pass = all(os.path.exists(f"proof/fixtures/{f}") for f in fixtures)
+fixture_pass = all(os.path.exists(f"data-analyst-visualization-skill/proof/fixtures/{f}") for f in fixtures)
 assert_check(fixture_pass, "Fixture integrity")
 
 # 2. SQL Validation
-sql_log = "proof/runners/sql_validation_log.txt"
+sql_log = "data-analyst-visualization-skill/proof/runners/sql_validation_log.txt"
 sql_pass = os.path.exists(sql_log) and "STATUS: PASS" in open(sql_log).read()
 assert_check(sql_pass, "SQL validation execution log exists and passed")
 
 # 3. Forecast Validation
-fc_log = "proof/runners/forecast_validation_log.txt"
+fc_log = "data-analyst-visualization-skill/proof/runners/forecast_validation_log.txt"
 fc_pass = os.path.exists(fc_log) and "STATUS: PASS" in open(fc_log).read()
 assert_check(fc_pass, "Forecast validation execution log exists and passed")
 
 # 4. Artifact Integrity
-exec_html = "proof/examples/executive_sales/executive_sales.html"
-analyst_html = "proof/examples/analyst_deep_dive/analyst_deep_dive.html"
+exec_html = "data-analyst-visualization-skill/proof/examples/executive_sales/executive_sales.html"
+analyst_html = "data-analyst-visualization-skill/proof/examples/analyst_deep_dive/analyst_deep_dive.html"
 art_pass = False
 if os.path.exists(exec_html) and os.path.exists(analyst_html):
     with open(exec_html, 'r', encoding='utf-8') as f:
@@ -44,7 +44,7 @@ if os.path.exists(exec_html) and os.path.exists(analyst_html):
 assert_check(art_pass, "Visual artifact generation & structure integrity")
 
 # 5. Benchmark Status Consistency
-bench = "proof/behavioral-benchmarks.md"
+bench = "data-analyst-visualization-skill/proof/behavioral-benchmarks.md"
 bench_pass = False
 if os.path.exists(bench):
     content = open(bench).read()

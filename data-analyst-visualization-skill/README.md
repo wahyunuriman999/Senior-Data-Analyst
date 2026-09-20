@@ -1,4 +1,4 @@
-# Apex Data Analyst & Visualization Skill
+﻿# Apex Data Analyst & Visualization Skill
 
 **Status:** IMPLEMENTED & PARTIALLY VALIDATED
 
@@ -11,7 +11,7 @@ This repository contains the architecture for the Apex Data Analyst intelligence
 - **Behavioral Benchmarks**: IMPLEMENTED (Fixtures created. Core SQL/Forecast/Vis tests executed. LLM COGNITIVE VALIDATION NOT EXECUTED).
 
 ## Evidence
-- Check `proof/examples/` for actual generated dashboard artifacts (HTML).
-- Check `proof/runners/` for SQL and Forecast execution logs proving the analytical methodologies.
-- Check `proof/fixtures/` for the synthetic datasets used in testing.
-- Check `proof/behavioral-benchmarks.md` for the exact strict status mapping of all 20 behavioral scenarios.
+- Check `data-analyst-visualization-skill/proof/examples/` for actual generated dashboard artifacts (HTML).
+- Check `data-analyst-visualization-skill/proof/runners/` for SQL and Forecast execution logs proving the analytical methodologies.
+- Check `data-analyst-visualization-skill/proof/fixtures/` for the synthetic datasets used in testing.
+- Check `data-analyst-visualization-skill/proof/behavioral-benchmarks.md` for the exact strict status mapping of all 20 behavioral scenarios.
