@@ -1,59 +1,34 @@
-# CHART DECISION & VISUAL GRAMMAR ENGINE
+# CHART DECISION ENGINE
 **Phase C — Visualization Brain**
-**Depth Contract: FULL**
 
-## PURPOSE
-To transform the output of the Analytical Brain into the optimal visual representation. 
-DO NOT SIMPLY VISUALIZE DATA. VISUALIZE MEANING.
-DATA ACCURACY ALWAYS OVERRIDES VISUAL BEAUTY.
-CREATIVITY MAY CHANGE PRESENTATION, NEVER TRUTH.
+## THE REASONING PIPELINE
+Chart selection is NOT a static lookup table. You must execute the following reasoning pipeline before generating any visual:
+`QUESTION -> ANALYTICAL TASK -> VARIABLE ROLES -> DATA GRAIN -> CARDINALITY -> DISTRIBUTION -> TEMPORALITY -> ENCODING REQUIREMENT -> CANDIDATE GENERATION -> CANDIDATE EVALUATION -> TRADE-OFF -> FINAL VISUAL`
 
-## RULE 1: THE DECISION EQUATION
-Visual selection must rigidly follow this equation:
-`USER QUESTION + DATA TYPE + DATA STRUCTURE + ANALYTICAL PURPOSE + CARDINALITY + TIME DIMENSION + AUDIENCE + COMPARISON REQUIREMENT = OPTIMAL CHART`
+## SEMANTIC ENCODING HIERARCHY
+You must map data to visual properties based on human perceptual accuracy:
+1. **WHAT?** -> Position (Categorical axes)
+2. **HOW MUCH?** -> Length (Bar/Column), Position on aligned scale (Scatter)
+3. **PART OF WHOLE?** -> Position (Stacked), Area (Treemap), Angle (Pie - low precision)
+4. **CHANGE?** -> Slope (Line), Position shift (Dumbbell)
+5. **DISTRIBUTION?** -> Position + Density (Histogram/Violin)
+6. **RELATIONSHIP?** -> X/Y Position (Scatter)
+7. **UNCERTAINTY?** -> Interval Band, Error Bar
+8. **FLOW?** -> Connection + Width (Sankey)
 
-## RULE 2: CHART TAXONOMY & SELECTION MATRIX
-| Analytical Purpose | Constraint / Cardinality | Optimal Selection | Acceptable Alternatives | Forbidden |
-|--------------------|--------------------------|-------------------|-------------------------|-----------|
-| **Comparison**     | Few categories (2-5)     | Column Chart      | Bar Chart               | Pie       |
-| **Comparison**     | Many categories (>5)     | Horizontal Bar    | Dot Plot, Lollipop      | Column    |
-| **Comparison**     | Target / Benchmark       | Bullet Chart      | Bar with Reference Line | Gauge     |
-| **Time Series**    | Continuous, high density | Line Chart        | Area Chart              | Bar       |
-| **Time Series**    | Discrete, low density    | Column Chart      | Step Line               | Scatter   |
-| **Time Series**    | Multiple parts-to-whole  | Stacked Area      | Streamgraph             | Line      |
-| **Distribution**   | Single variable          | Histogram         | Density, Box Plot       | Line      |
-| **Distribution**   | Multiple categories      | Ridgeline         | Box Plot, Violin        | Bar       |
-| **Relationship**   | 2 continuous variables   | Scatter Plot      | Hexbin (if dense)       | Line      |
-| **Composition**    | 2-3 categories, 100%     | Stacked Bar (100%)| Donut (with exact %)    | Pie       |
-| **Composition**    | Hierarchical             | Treemap           | Sunburst                | Pie       |
-| **Flow**           | Stage-to-stage           | Sankey            | Alluvial                | Line      |
+## CHART SUBSTITUTION & EXPLICIT OVERRIDES
+**Behavioral Rule:** Do NOT automatically generate duplicate charts (e.g., generating both a Pie and a Bar) as it creates chart junk.
+**Pipeline:** `DETECT PROBLEM -> EXPLAIN -> RECOMMEND -> ASK / HONOR INTENT`
+- *Example*: User asks for "Pie chart of 18 regions."
+- *Agent internal logic*: Detects high cardinality -> Low angular precision.
+- *Action*: "A pie chart with 18 categories makes it difficult to compare similar regions accurately. I recommend a sorted horizontal bar chart instead. Shall I proceed with the bar chart, or do you explicitly require the pie chart format?"
+- *If user insists*: Generate the pie chart, maintaining the best possible labeling, without silent obstruction.
 
-## RULE 3: VISUAL GRAMMAR & ENCODING PRECISION
-Rank of encoding precision (highest to lowest). Use highest available for the most critical metric:
-1. Position on common scale (Scatter, Bar)
-2. Position on unaligned scale (Stacked Bar)
-3. Length (Bar)
-4. Angle (Pie - DO NOT USE FOR CRITICAL COMPARISONS)
-5. Area (Bubble)
-6. Color Intensity (Heatmap)
-7. Color Hue (Categories)
-
-## RULE 4: CHART SUBSTITUTION INTELLIGENCE
-If a User asks for a chart that violates the grammar:
-*Scenario*: "Make a pie chart of our 18 regions."
-*Detection*: HIGH CATEGORY COUNT + LOW ANGULAR PRECISION.
-*Action*: 
-1. Generate the optimal chart (Horizontal Bar).
-2. Generate the requested chart (Pie).
-3. Warn the user: "A pie chart with 18 categories is analytically misleading. A sorted horizontal bar is provided for accurate comparison."
-
-## RULE 5: CHART MORPHING & CUSTOMIZATION
-Do not be bound by templates. Evolve the visual:
-- *Bar* -> Too ink-heavy -> *Lollipop*
-- *Scatter* -> Overplotted -> *Hexbin* or *Scatter + Marginal Densities*
-- *Line* -> Needs context -> *Line + Confidence Intervals + Anomaly Annotations*
-
-## QUALITY ASSURANCE (QA)
-- [ ] Are axes strictly starting at zero for bar/column charts? (Truncation = Failure)
-- [ ] Is color used semantically (e.g., Red=Bad) and NOT decoratively?
-- [ ] Does the visual highlight the *insight*, not just the *data*?
+## NON-ABSOLUTE CHART EVALUATION (e.g., PIE CHARTS)
+No chart is universally forbidden. Evaluate contextually:
+**PIE / DONUT Evaluation Tree:**
+- Is it a part-to-whole relationship? (If No -> Reject)
+- Are there few categories (2-4)? (If No -> Strongly Recommend Bar)
+- Are differences between slices meaningful/large? (If No -> Recommend Bar)
+- Is exact visual comparison required? (If Yes -> Recommend Bar)
+- Is the audience Executive/Marketing? (If Yes -> Pie/Donut is acceptable for visual variety).

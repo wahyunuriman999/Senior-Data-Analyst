@@ -1,39 +1,32 @@
-# QUALITY & SELF-CRITIQUE ENGINE
+# QA & SELF-CRITIQUE ENGINE
 **Phase F — Quality Brain**
-**Depth Contract: FULL**
 
-## PURPOSE
-To act as the final hostile reviewer before presenting artifacts to the user. 
-A BEAUTIFUL WRONG DASHBOARD IS A FAILED DASHBOARD.
+## OPERATIONAL QA CHECKS
+Instead of a simple checklist, use explicit operational definitions for every check:
 
-## THE 5-LAYER QA GATE
+### Q1: Join Grain Integrity
+- **CHECK**: Does the join multiply rows unexpectedly?
+- **INPUT**: Left row count, Right row count, Join keys.
+- **FAIL CONDITION**: Output rows > Left rows (in a Many-to-One intent).
+- **SEVERITY**: CRITICAL.
+- **FIX**: Pre-aggregate the Many side, or use a bridge table.
+- **RETEST**: Reconcile a core measure (e.g., SUM(revenue)) pre and post join.
 
-### 1. DATA QA
-- [ ] Grain match? (No duplicate multiplication in joins).
-- [ ] Missingness handled? (No blind mean imputation).
-- [ ] Outliers acknowledged? 
+### Q2: Percentage vs Percentage-Point
+- **CHECK**: Correct terminology for rate changes.
+- **FAIL CONDITION**: Saying "increased by 2%" when moving from 10% to 12%.
+- **SEVERITY**: MAJOR.
+- **FIX**: Rewrite to "increased by 2 percentage points" or "increased by 20% relative".
 
-### 2. CALCULATION QA
-- [ ] Denominators intact? (Did filtering remove the baseline?)
-- [ ] Percentage change vs Percentage-point change used correctly?
-- [ ] Aggregation logic matches metric definition?
-
-### 3. STATISTICAL QA
-- [ ] Correlation != Causation explicit?
-- [ ] Sample size sufficient for claims?
-- [ ] Uncertainty / Confidence Intervals visualized?
-
-### 4. VISUALIZATION QA
-- [ ] Chart type passes Decision Engine rules?
-- [ ] Axes not misleadingly truncated?
-- [ ] Units and currency consistent?
-- [ ] No chart junk (3D, unnecessary gridlines, heavy borders)?
-
-### 5. STORY QA
-- [ ] Does the headline exceed the evidence?
-- [ ] Is the most important insight visually dominant?
-- [ ] Are next steps or diagnostic hypotheses clear?
-
-## THE SELF-CRITIQUE LOOP
-`GENERATE -> INSPECT -> CRITIQUE -> CLASSIFY -> FIX -> RE-INSPECT -> PASS/FAIL`
-If an output fails any of the 5 QA layers, the Agent MUST fix it before finalizing the turn. Do not present a broken chart with an apology; present a fixed chart.
+## SELF-CRITIQUE SCHEMA
+Before presenting the final analytical artifact, the AI must internally generate a critique using this strict schema:
+```yaml
+ISSUE:
+  Category: [Data | Calculation | Statistical | Visual | Design | Story]
+  Severity: [Critical | Major | Minor | Info]
+  Evidence: [What specifically triggered this?]
+  Impact: [How does this mislead the user?]
+  Fix: [What action was taken to correct it?]
+  Status: [PASS | FAIL]
+```
+If ANY Critical or Major issue remains FAIL, the AI must NOT output the artifact to the user. Fix it first.
