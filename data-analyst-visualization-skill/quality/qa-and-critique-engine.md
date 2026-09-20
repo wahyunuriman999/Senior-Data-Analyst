@@ -1,32 +1,50 @@
 # QA & SELF-CRITIQUE ENGINE
-**Phase F — Quality Brain**
 
-## OPERATIONAL QA CHECKS
-Instead of a simple checklist, use explicit operational definitions for every check:
+## DEEP OPERATIONAL QA CHECKS
+All outputs must pass these checks. Failure triggers the Self-Critique loop.
 
-### Q1: Join Grain Integrity
-- **CHECK**: Does the join multiply rows unexpectedly?
-- **INPUT**: Left row count, Right row count, Join keys.
-- **FAIL CONDITION**: Output rows > Left rows (in a Many-to-One intent).
-- **SEVERITY**: CRITICAL.
-- **FIX**: Pre-aggregate the Many side, or use a bridge table.
-- **RETEST**: Reconcile a core measure (e.g., SUM(revenue)) pre and post join.
+### DATA QA
+- **Q-DATA-001 Schema**: Input: Columns. Fail: Expected schema mismatch.
+- **Q-DATA-002 Missingness**: Input: NULL counts. Fail: Silent imputation applied to MNAR data. Severity: CRITICAL. Fix: Require imputation strategy reasoning.
+- **Q-DATA-003 Duplicate**: Input: Row keys. Fail: Primary key violated.
+- **Q-DATA-004 Grain**: Input: Group By clauses. Fail: Aggregating mixed grains. Severity: CRITICAL.
+- **Q-DATA-005 Join**: Input: Row counts. Fail: Cartesian explosion. Severity: CRITICAL.
+- **Q-DATA-006 Referential Integrity**: Input: Foreign keys. Fail: Orphan records > 0.
+- **Q-DATA-007 Currency**: Input: Currency symbols. Fail: Summing mixed currencies. Severity: MAJOR.
+- **Q-DATA-008 Timezone**: Input: Timestamps. Fail: Grouping by date across mixed timezones.
+- **Q-DATA-009 Unit**: Input: Unit measures. Fail: Summing Kg and Lbs.
+- **Q-DATA-010 Freshness**: Input: Max date. Fail: Data is older than analysis context.
+- **Q-DATA-011 Outlier**: Input: Z-scores. Fail: Blind deletion of outliers.
 
-### Q2: Percentage vs Percentage-Point
-- **CHECK**: Correct terminology for rate changes.
-- **FAIL CONDITION**: Saying "increased by 2%" when moving from 10% to 12%.
-- **SEVERITY**: MAJOR.
-- **FIX**: Rewrite to "increased by 2 percentage points" or "increased by 20% relative".
+### CALCULATION QA
+- **Q-CALC-001 Numerator**: Fail: Incorrect numerator definition.
+- **Q-CALC-002 Denominator**: Fail: Denominator drops legitimate zeros. Severity: CRITICAL.
+- **Q-CALC-005 Percentage**: Fail: Confusing % change with percentage points. Severity: MAJOR.
 
-## SELF-CRITIQUE SCHEMA
-Before presenting the final analytical artifact, the AI must internally generate a critique using this strict schema:
+### STATISTICAL QA
+- **Q-STAT-001 Sample Size**: Fail: n < 30 without uncertainty bounds.
+- **Q-STAT-004 Multiple Testing**: Fail: k > 1 hypotheses tested without Bonferroni/FDR correction.
+- **Q-STAT-005 Causality**: Fail: Using "causes" for observational data. Severity: CRITICAL.
+
+### VISUALIZATION QA
+- **Q-VIS-001 Chart Fit**: Fail: Chart violates visual grammar engine.
+- **Q-VIS-002 Axis**: Fail: Truncated zero baseline on bar chart. Severity: CRITICAL.
+- **Q-VIS-006 Overplotting**: Fail: Scatter plot is a solid block of ink. Fix: Use hexbin.
+
+### STORY QA
+- **Q-STORY-001 Claim Support**: Fail: Headline exceeds evidence. Severity: CRITICAL.
+
+## UPGRADED SELF-CRITIQUE SCHEMA
+Before outputting, execute:
 ```yaml
 ISSUE:
-  Category: [Data | Calculation | Statistical | Visual | Design | Story]
+  Category: [e.g., Visualization]
   Severity: [Critical | Major | Minor | Info]
-  Evidence: [What specifically triggered this?]
-  Impact: [How does this mislead the user?]
-  Fix: [What action was taken to correct it?]
-  Status: [PASS | FAIL]
+  Evidence: [e.g., Axis starts at 50 instead of 0]
+  Impact: [e.g., Exaggerates the difference between categories]
+  Fix: [e.g., Set y-axis minimum to 0]
+  Retest: [e.g., Verified axis limits in final chart object]
+  RetestEvidence: [e.g., Code confirms ymin=0]
+  Status: [PASS]
 ```
-If ANY Critical or Major issue remains FAIL, the AI must NOT output the artifact to the user. Fix it first.
+Critical/Major FAIL -> Artifact CANNOT be finalized. FIX WITHOUT RETEST = NOT VERIFIED.

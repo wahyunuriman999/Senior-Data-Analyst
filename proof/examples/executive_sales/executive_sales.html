@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Executive Sales Summary</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        body { font-family: -apple-system, system-ui, sans-serif; background: #f4f6f8; color: #333; margin: 0; padding: 20px; }
+        .dashboard { display: grid; gap: 20px; grid-template-columns: 1fr 1fr 1fr; max-width: 1400px; margin: 0 auto; }
+        .card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .kpi-value { font-size: 32px; font-weight: bold; margin: 10px 0; }
+        .kpi-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #888; }
+        .chart { width: 100%; height: 300px; }
+        .annotation { border-left: 3px solid #007bff; padding-left: 10px; margin-top: 15px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <h2>Executive Sales Summary</h2>
+    <div class="dashboard">
+        
+<div class="card" style="grid-column: span 1"><div class="kpi-label">Total Revenue</div><div class="kpi-value">$1.2M</div><span style="color: green">↑ 18% YoY</span></div>
+<div class="card" style="grid-column: span 1"><div class="kpi-label">Active Customers</div><div class="kpi-value">4,521</div><span style="color: green">↑ 5% YoY</span></div>
+<div class="card" style="grid-column: span 1"><div class="kpi-label">Churn Rate</div><div class="kpi-value">2.1%</div><span style="color: red">↑ 0.5pp YoY</span></div>
+<div class="card" style="grid-column: span 3">
+    <div class="kpi-label">Revenue Trend & Structural Break</div>
+    <div id="chart1" class="chart"></div>
+    <div class="annotation"><strong>Insight:</strong> Revenue dropped sharply in Q3 due to the policy change, but stabilized at a new baseline.</div>
+</div>
+
+    </div>
+    <script>
+        
+var chartDom = document.getElementById('chart1');
+var myChart = echarts.init(chartDom);
+myChart.setOption({
+    tooltip: {trigger: 'axis'},
+    xAxis: {type: 'category', data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep']},
+    yAxis: {type: 'value'},
+    series: [{data: [1000, 1100, 1050, 1200, 1300, 1250, 800, 850, 820], type: 'line', smooth: true, 
+              markLine: {data: [{xAxis: 'Jul', label: {formatter: 'Policy Change'}}]}}]
+});
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+--- SQL INTELLIGENCE VALIDATION ---
+Input Data: orders (total=800), order_tags (N:M relation on order 1)
+BAD JOIN (Fan-out) SUM(total) = 1300 (INFLATED)
+GOOD JOIN (CTE Pre-agg) SUM(total) = 800 (CORRECT GRAIN)
+LAG WINDOW FUNCTION RESULTS:
+Month 1: Rev 100, Prev None, Change None
+Month 2: Rev 120, Prev 100, Change 20
+Month 3: Rev 110, Prev 120, Change -10
+Month 4: Rev 150, Prev 110, Change 40
+STATUS: PASS

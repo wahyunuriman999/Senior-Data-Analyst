@@ -1,0 +1,9 @@
+--- FORECASTING VALIDATION ---
+Scenario: Time Series with Structural Break at index 14
+Train Size: 14, Test Size: 10
+Test Actuals (Post-break): [1350, 1420, 1490]...
+Naive Forecast (Pre-break extrapolation): [1740, 1740, 1740]...
+MAE: 169.00
+RMSE: 206.91
+EVALUATION: The naive model failed to adapt to the structural break, highlighting the necessity of structural break detection algorithms before forecasting.
+STATUS: PASS

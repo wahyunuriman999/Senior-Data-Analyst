@@ -1,20 +1,16 @@
 # Apex Data Analyst & Visualization Skill
 
-**Status:** VALIDATED APEX ARCHITECTURE (Phase H)
+**Status:** VALIDATED ARCHITECTURE (Phase I Evidence Gate)
 
-This repository contains the complete, behaviorally-validated Apex Data Analyst intelligence system. It transforms an AI into a deeply reasoned, evidence-driven Data Analyst with world-class visualization intelligence.
+This repository contains the architecture for the Apex Data Analyst intelligence system. 
 
-## Reference Dashboard Styles
-This skill uses extracted design principles from premium analytical frameworks:
-1. Modern SaaS Executive Sales Design
-2. Corporate Financial Performance Layout
-3. Cinematic Operational Network Density
-*(Note: These are reference styles used by the Design Engine to guide programmatic visualization, not hardcoded image templates).*
+## Capabilities & Validation Status
+- **Foundation & Analytical Engines**: IMPLEMENTED & PARTIALLY VALIDATED (SQL and Forecasting verified via execution runners).
+- **Visualization & Dashboard Engines**: IMPLEMENTED & VALIDATED (Real visual artifacts generated via ECharts/HTML in `proof/examples`).
+- **QA Engine**: IMPLEMENTED (Deep Q-DATA-001 to Q-STORY-005 rules mapped).
+- **Behavioral Benchmarks**: IMPLEMENTED (Fixtures created. Core SQL/Forecast/Vis tests executed. LLM cognitive tests staged for execution).
 
-## Architecture
-- `foundation/`: Metric Definitions, Data Grain, Provenance.
-- `analytical/`: Diagnostics, Variance, SQL Intelligence, Forecasting.
-- `visualization/`: Chart Reasoning Pipeline, Semantic Encodings.
-- `dashboards/`: Audience Density, Information Hierarchy.
-- `quality/`: 5-Layer QA Gate, Strict Self-Critique Schema.
-- `proof/`: 20 Executed Behavioral Benchmarks (B01-B20).
+## Evidence
+- Check `proof/examples/` for actual generated dashboard artifacts (HTML).
+- Check `proof/runners/` for SQL and Forecast execution logs proving the analytical methodologies.
+- Check `proof/fixtures/` for the synthetic datasets used in testing.
