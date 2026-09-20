@@ -238,8 +238,10 @@ If any definition differs → comparison is INVALID. Resolve before proceeding.
 
 ### STEP 2 — Compute Descriptive Statistics Per Group
 ```
-For each group, complete Descriptive Analysis Engine (B1.1):
-    n, mean, median, std_dev, IQR, distribution shape, outlier flags
+IF descriptive evidence is not already established:
+    For each group, complete Descriptive Analysis Engine (B1.1).
+ELSE:
+    Retrieve existing profile evidence (n, central tendency, distribution shape).
 These are required inputs to method selection in Step 3.
 ```
 
@@ -392,7 +394,7 @@ $$z = \frac{\hat{p}_A - \hat{p}_B}{\sqrt{\hat{p}_{pool}(1-\hat{p}_{pool})\left(\
 ## PRECONDITIONS
 - [ ] Metric Contracts are identical for both groups (Foundation A1).
 - [ ] Grain contracts confirmed for both datasets (Foundation A2).
-- [ ] Descriptive profiles completed for both groups (Engine B1.1).
+- [ ] Descriptive profile evidence is available (either pre-existing, provided by user, or freshly computed via Engine B1.1).
 - [ ] Practical significance threshold defined before testing (not after seeing results).
 - [ ] Sample sizes are known (n_A, n_B).
 
@@ -457,6 +459,13 @@ RIGHT: "Users with Feature X show $400 higher LTV. This is an observational find
         Feature X adoption is correlated with user type (enterprise vs. SMB).
         The difference may reflect segment composition, not Feature X's causal impact.
         Causal evidence requires a randomized rollout."
+`
+
+**Counterexample C — Pre-profiled dataset blocking (Rule exception test):**
+`
+Request: "I already ran profiling on this clean A/B test data. Normal distribution, n=5000 each. Compare means."
+WRONG (Over-constrained): "BLOCKED. Must run Engine B1.1 first."
+RIGHT: "Descriptive evidence provided (Normal, n=5000). Proceeding directly to Welch's t-test (Step 3)."
 ```
 
 ---

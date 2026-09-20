@@ -1,4 +1,4 @@
-# DRIVER ANALYSIS ENGINE
+﻿# DRIVER ANALYSIS ENGINE
 **Phase B — Analytical Brain | Engine B1.4**
 **Depth Contract: FULL (17/17 + Analytical Reasoning Contract 8/8)**
 
@@ -126,11 +126,11 @@ FORBIDDEN: "Feature X drives a 10% increase in LTV."
 FORBIDDEN: "To improve conversion, we need to increase Metric Y."
 
 REQUIRED: "Feature X is the strongest predictor of high LTV in the historical data."
-REQUIRED: "Metric Y is highly associated with conversion. We recommend an A/B test to see
-           if intervening on Metric Y causally improves conversion."
+REQUIRED: "Metric Y is highly associated with conversion. It is a strong candidate lever. 
+           We recommend an A/B test to validate if intervening on Metric Y causally improves conversion."
 
-Only refer to variables as "Predictors", "Correlates", or "Leading Indicators", unless
-the data comes from a randomized experiment.
+Observational associations may generate "Candidate Drivers," "Hypotheses," or "Candidate Levers."
+However, explicitly label them as associational hypotheses. Do NOT present them as proven causal interventions unless the data comes from a randomized experiment.
 ```
 
 ### G. Uncertainty Handling
@@ -372,18 +372,17 @@ STEP 8: Output Report
 
 **Engine Response:**
 ```
-BLOCKED — Causal interpretation of observational driver analysis.
+CAUSAL CLAIM BLOCKED — Re-framing as Candidate Levers.
 
-ISSUE: Driver analysis identifies what correlates with conversion, not what causes it.
-       Changing a highly ranked feature (e.g., 'Viewed Pricing Page') by forcing all users
-       to view the pricing page may decrease conversion, despite the positive correlation.
+ISSUE: Driver analysis identifies what correlates with conversion (associational), not what causes it.
+       You asked what to "change" (intervention). I cannot guarantee a causal outcome from observational data.
 
 ACTION:
-    1. Driver analysis will output the top PREDICTORS of conversion.
-    2. These predictors must be treated as HYPOTHESES for experimentation.
-    3. Causal language ("features to change to increase conversion") is rejected.
+    I will identify the top PREDICTORS of conversion and present them as CANDIDATE LEVERS (Hypotheses).
+    Changing a highly ranked feature (e.g., 'Viewed Pricing Page') by forcing users to view it
+    may decrease conversion despite the correlation. Causal validation requires an experiment.
 
-OUTPUT PROCEEDING WITH OBSERVATIONAL REPORT ONLY...
+OUTPUT PROCEEDING WITH CANDIDATE LEVERS (HYPOTHESES) REPORT...
 ```
 
 ---
@@ -399,7 +398,7 @@ OUTPUT PROCEEDING WITH OBSERVATIONAL REPORT ONLY...
 | ID | Input | Expected Output | Pass Condition |
 |----|-------|----------------|----------------|
 | DRV-001 | 3 highly correlated drivers (r=0.95) | VIF flag triggered | Engine refuses standard OLS betas |
-| DRV-002 | Request containing causal language ("levers to pull") | Causal blocking activated | Warning emitted, text rephrased |
+| DRV-002 | Request causal levers from observational data | "Candidate lever" allowed with hypothesis label; proven causal claim blocked | Engine reframes request but does not fail |
 | DRV-003 | Continuous target, linear relationships | Relative Importance or Std Beta used | Standardization applied before fit |
 | DRV-004 | Target with no strong drivers (R² = 0.02) | "Weak signal" warning reported | Engine does not over-hype the #1 weak driver |
 

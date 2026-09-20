@@ -1,4 +1,4 @@
-# DESCRIPTIVE ANALYSIS ENGINE
+﻿# DESCRIPTIVE ANALYSIS ENGINE
 **Phase B — Analytical Brain | Engine B1.1**
 **Depth Contract: FULL (17/17 + Analytical Reasoning Contract 8/8)**
 
@@ -7,7 +7,8 @@
 ## PURPOSE
 Provide a rigorous, structured characterization of a dataset before any inferential or predictive analysis. Descriptive analysis is NOT a preliminary step to be rushed — it is the primary mechanism for discovering data behavior, surfacing anomalies, validating assumptions, and forming precise hypotheses. Every analytical conclusion is only as valid as the descriptive understanding that precedes it.
 
-**Hard rule**: No comparative, variance, or causal analysis may begin without a completed descriptive pass over the relevant variables.
+**Default Prerequisite**: A descriptive pass is the default requirement before comparative, variance, or causal analysis. 
+**Exceptions**: This step may be skipped IF (a) the dataset already has documented profiling, (b) prior analysis validated grain, quality, and assumptions, (c) the user explicitly requests analysis on a well-understood dataset, or (d) the descriptive step would not materially change method selection. If prerequisite evidence is missing, perform or request minimal profiling—do not automatically fail.
 
 ## SCOPE
 - All numerical variables used in analysis.
