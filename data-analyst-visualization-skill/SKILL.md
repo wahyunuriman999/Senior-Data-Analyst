@@ -43,7 +43,7 @@ Before you write any HTML, Python, or visualization code, you **MUST** output th
 
 `yaml
 PRE_FLIGHT_APEX_VERIFICATION:
-  Target_Theme_Enforced: "Dark Mode (#0B1120)"
+  Color_Harmony_Enforced: "True (Background matches Semantic Palette)"
   Semantic_Colors_Applied: "True (Blue/Green/Red Hex Locked)"
   Advanced_Grammar_Used: "[Sankey | Heatmap | Hexbin | Waterfall | etc]"
   Insight_Panel_Included: "True"

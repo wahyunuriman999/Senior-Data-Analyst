@@ -3,10 +3,10 @@
 ## CORE MANDATE: THE README EXPECTATION BASELINE
 The 10 example artifacts showcased in the repository's README.md are not just mockups; they are the **Minimum Accepted Standard**. Users expect the AI to generate outputs that *exactly* match or exceed the visual fidelity, color precision, and density of those examples.
 
-### 1. The Apex Enterprise Dark Theme (Default)
+### 1. The Apex Enterprise Theme Matrix
 To guarantee consistency with the README expectations, you MUST adhere to this exact color and styling matrix:
 
-**Background & Surface (Deep Space Blue/Gray):**
+**Background & Surface (Flexible Harmonious Matrix):**
 - **App Background**: #0B1120 or #050505
 - **Card/Panel Surface**: #111827 or #1E293B
 - **Borders/Dividers**: #374151 (Thin, solid)
