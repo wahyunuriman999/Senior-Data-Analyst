@@ -1,4 +1,4 @@
-﻿# QA & SELF-CRITIQUE ENGINE
+# QA & SELF-CRITIQUE ENGINE
 **Phase F — Quality Brain**
 
 ## DEEP OPERATIONAL QA CHECKS
@@ -90,3 +90,17 @@ Never build a "Hollywood Set" dashboard (where numbers look good but are hardcod
    - Right: "Scenario: Loss of top customer would reduce starting MRR by X%."
 4. **FILTER ENGINE REALITY**: Filters must run a .filter() on the SSOT array and trigger a complete recalculation of ALL metrics, waterfall steps, Pareto curves, and AI narratives.
 5. **EXPLICIT RISK RULES**: If labeling a customer "High Risk", the UI must explicitly state the rule (e.g., Risk Rule: Usage Drop > 40% AND Tickets > 5).
+
+### 🚨 Q-VIS-INTERACTION: HEADER SLICER & UNIVERSAL CROSS-FILTERING (CLICK-TO-FILTER)
+1. **Q-VIS-HEADER-SLICER**: The primary filter controls (Slicers) MUST be anchored in the dashboard Header/Subheader bar (Sticky top). Active selections must render as removable chips (e.g., `[ 📍 Kota: Bandung ✕ ]`), with a 1-click `[ Reset / Clear All ]` button.
+2. **Q-VIS-CROSS-FILTER (CLICK-TO-FILTER)**:
+   - Clicking ANY dimension data point (e.g. clicking the "Bandung" bar in the regional chart or "Bandung" row in a table) MUST immediately cross-filter the entire dashboard to that entity.
+   - All KPIs, trend lines, secondary breakdowns, and detail tables MUST dynamically recalculate to the clicked entity in real-time.
+   - Visual highlighting: Selected item remains prominent; non-selected items are dimmed.
+   - Reversible: Clicking the selected item again or clicking the chip's `✕` resets back to consolidated view.
+
+### 🚨 Q-VIS-ANTI-SLOP: ANTI-SLOP RULEBOOK VERIFICATION
+1. **NO FILLER COPY**: No generic AI hype sentences ("empowering business insights", "unleash actionable intelligence"). Plain, factual, domain-accurate descriptions only.
+2. **NO INVENTED / VANITY METRICS**: Every number must be grounded in underlying data. No mock numbers to fill layout empty space.
+3. **RESTRAINED EXECUTIVE STYLING**: Strictly forbid 3D charts, gamer RGB neons, decorative shadows, or unreadable color contrasts.
+4. **PURE SIGNAL CODE**: Zero redundant AI comment blocks or noisy ASCII banners in code artifacts. Clean, direct, and accessible.

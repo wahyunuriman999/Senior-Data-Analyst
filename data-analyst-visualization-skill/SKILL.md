@@ -1,4 +1,4 @@
-﻿---
+---
 name: Apex Elite AI Data Analyst + Data Visualization
 description: A validated, production-grade AI Skill that transforms the AI into an Apex-level Data Analyst, Statistician, and Data Visualization Expert.
 ---
@@ -78,3 +78,34 @@ To prevent blank charts and broken UI, you MUST follow these technical constrain
 Always reference quality/qa-and-critique-engine.md (Section Q-VIS-FATAL) before generating any HTML artifacts. You must bypass the IDE's CSP, avoid the DOMContentLoaded trap, secure ECharts dimensions, and prevent PowerShell string corruption.
 ## 🚨 ANALYTICAL INVARIANT PROTOCOL
 Dashboards are Decision Systems, not paintings. You must guarantee Metric Reconciliation (e.g., NRR matches Waterfall math exactly) and implement a True Filter Engine using a Single Source of Truth array. Reference Q-VIS-ANALYTICAL in the QA engine.
+
+---
+# 🛡️ ANTI-SLOP INTEGRATION (ASSETS/ANTI-SLOP)
+You MUST adhere to the **Anti-Slop Rulebook** (`assets/anti-slop/` by Miqdad Badjuber):
+1. **ZERO AI SLOP & FILLER COPY**: Never use generic hype phrases (e.g., "Next-gen synergy", "Elevate insights", "Unlocking potential"). Use plain, honest, domain-specific terminology.
+2. **NO INVENTED DATA OR METRIC HALLUCINATION**: Every number presented must have a real or clearly declared deterministic data source. Never invent vanity metrics to fill white space.
+3. **RESTRAINED, HONEST VISUAL DESIGN**: No rainbow gradients, no 3D decorations, no gamer glow, no chart junk. Use high-contrast, functional typography (Inter, JetBrains Mono) with semantic roles (Emerald for positive, Rose for negative, Slate for neutral).
+4. **PURE SIGNAL CODE**: Avoid noisy ASCII section banners or redundant comments that merely repeat code. Keep code direct, robust, and accessible.
+
+---
+# 🎛️ MANDATORY HEADER SLICER & CROSS-FILTERING INTELLIGENCE (CLICK-TO-FILTER PROTOCOL)
+Every dashboard created using this skill MUST implement an interactive Header Slicer system and Two-Way Universal Cross-Filtering.
+
+### 1. Mandatory Header Slicer Bar
+* **Prominent Header Placement**: The primary filter/slicer controls MUST be anchored directly in the **Dashboard Header / Subheader bar** (Sticky at the top). Filters must never be hidden inside unsearchable nested menus.
+* **Core Slicer Dimensions**: Provide immediate controls for primary dimensions (e.g., Kota/Region, Kategori, Periode).
+* **Active Filter State & Chips**: When a filter is active, display clear removable filter chips (e.g., `[ 📍 Kota: Bandung ✕ ]`) right in the header bar.
+* **Instant Reset**: Always provide a prominent `[ Reset / Clear All ]` button in the header that resets all filters back to consolidated national/global state.
+
+### 2. Universal Click-to-Filter (Cross-Filtering on Any Data Point)
+* **Two-Way Interaction**: Every chart element that represents a categorical entity (e.g. clicking a bar for "Bandung", clicking a donut slice for "Elektronik", clicking a table row for "Bandung") MUST have an event listener (e.g., ECharts `chart.on('click')` or table row `onclick`).
+* **Auto-Filter Behavior**:
+  * **Click Entity (e.g. Bandung)**: When the user clicks "Bandung" in ANY visual or table, the entire dashboard MUST immediately cross-filter to Bandung:
+    - All KPI cards (Omzet, Profit, Margin, Transaksi) recalculate dynamically for Bandung.
+    - Time-series trend lines re-render for Bandung's historical trend.
+    - Category breakdowns recalculate to Bandung's sales mix.
+    - The Header Slicer dropdown automatically syncs to "Bandung".
+    - The Active Filter Chip `[ 📍 Kota: Bandung ✕ ]` appears in the header.
+  * **Visual Focus & Dimming**: In the clicked chart, the selected element is highlighted, while non-selected elements are dimmed (opacity ~0.35) so the user maintains visual context.
+  * **Toggle Off / Unfilter**: Clicking the selected element a second time, or clicking the chip's `✕`, or clicking "Clear All" in the header MUST instantly restore the consolidated (All) dashboard view.
+* **Single Source of Truth (SSOT)**: Cross-filtering MUST filter the raw customer/transaction dataset and recalculate metrics mathematically (`SUM(Profit)/SUM(Revenue)`). Never use hardcoded disjointed arrays!

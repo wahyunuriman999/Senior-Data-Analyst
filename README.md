@@ -1,4 +1,4 @@
-﻿<div align="center">
+<div align="center">
 
 # 🦅 APEX ELITE AI DATA ANALYST
 **The Ultimate Evidence-Driven Data Visualization & Analytics Skill**
@@ -58,28 +58,31 @@ The architecture is **fully implemented** and **deterministically validated** th
 | 🗄️ **SQL Intelligence** | Window Functions, N:M Fan-out Prevention | 🟢 DETERMINISTIC PASS |
 | 🎨 **Visualization Engine**| Grammar Selection, Semantic Encodings | 🟢 ARTIFACTS GENERATED |
 | 🛡️ **Quality (QA) Gate** | Q-DATA-001 to Q-STORY-005 Operational Checks | 🟢 IMPLEMENTED |
+| 🛡️ **Anti-Slop Engine** | Rulebook `assets/anti-slop` Integrated | 🟢 ACTIVE |
+| 🎛️ **Header Slicer & Cross-Filter** | Click-to-Filter Auto Synced Dashboard | 🟢 IMPLEMENTED |
 | 🧪 **Behavioral Proofs** | 20 Adversarial Cases (Fixtures Ready) | 🟡 LLM PENDING |
 
 ---
 
 ## 📂 Architecture Tree
 
-`	ext
-data-analyst-visualization-skill/
-├── SKILL.md            # Entry Point for the AI
-├── README.md           # This Documentation
-├── foundation/         # Metric Definitions, Grain, Provenance
-├── analytical/         # Diagnostics, Variance, SQL Intelligence
-├── visualization/      # Chart Reasoning Pipeline
-├── dashboards/         # Audience Density, Information Hierarchy
-├── design/             # Whitespace & Semantic Color Rules
-├── quality/            # 5-Layer QA Gate & Self-Critique Schema
-└── proof/              # Fixtures, Runners, and HTML Artifacts
-`
+```text
+Senior-Data-Analyst/
+├── assets/
+│   ├── anti-slop/      # Anti-Slop Rulebook & Plugins (by Miqdad Badjuber)
+│   └── *.jpg           # 10 Reference Apex Visualizations
+├── data-analyst-visualization-skill/
+│   ├── SKILL.md        # Entry Point for AI Agent (Anti-Slop & Click-to-Filter Enforced)
+│   ├── design/         # Slicer Bar & Cross-Filtering Protocol
+│   ├── quality/        # Q-VIS-FATAL, Q-VIS-ANALYTICAL & Q-VIS-INTERACTION
+│   └── proof/examples/ # Fully Reconciled ECharts Dashboards
+└── Final_CrossFilter_Dashboard.html # Live Interactive Click-to-Filter Proof
+```
 
 ## 🔍 Validation Evidence
 The integrity of this skill is backed by deterministic tests in the proof/ directory:
-- 📈 **Artifacts:** Check proof/examples/ for generated ECharts HTML dashboards.
+- 📈 **Artifacts:** Check proof/examples/ for generated ECharts HTML dashboards, including `Final_CrossFilter_Dashboard.html` demonstrating two-way Click-to-Filter (e.g. click Bandung -> entire dashboard updates to Bandung).
+- 🛡️ **Anti-Slop Rulebook:** Reference `assets/anti-slop/` for zero-slop UI, copy, and code standards.
 - ⚙️ **Logs:** Check proof/runners/ for SQL and Forecast execution logs proving the analytical rigor.
 - 💾 **Data:** Check proof/fixtures/ for synthetic datasets (e.g., many_to_many.csv).
 - 📜 **Benchmarks:** Read proof/behavioral-benchmarks.md for the strict status of all 20 scenarios.
