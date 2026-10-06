@@ -76,7 +76,7 @@ The architecture is **fully implemented** and **deterministically validated** th
 | 🎨 **Design Tokens** | `design/tokens.json` machine-readable | 🟢 IMPLEMENTED |
 | 🔍 **Validator** | `validator/apex_validate.py` — 12 static checks | 🟢 PASSING |
 | ⚙️ **Executable Engine** | `tools/apex/`: CSV/demo → v2 dashboard HTML (10 domains, 12/12 each) | 🟢 PASSING |
-| 🧪 **Behavioral Proofs** | 19 adversarial cases (T1–T3,T7,C1–C15); harness in `eval/`, LLM execution in progress | 🟡 RUNNING |
+| 🧪 **Behavioral Proofs** | 19 adversarial cases (T1–T3,T7,C1–C15) — **19/19 PASS** on `wx/muse-agent`, see `eval/results_2026-10-06_wx-muse-agent.md` | 🟢 PASS |
 | 🤖 **LLM-Following-Skill Proof** | 2026-10-06: AI-built dashboard, 15/15 tests | 🟢 PASS |
 
 ---
