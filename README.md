@@ -85,12 +85,12 @@ Senior-Data-Analyst/
 ├── validator/
 │   ├── apex_validate.py # 12 machine-checkable compliance checks (stdlib only)
 │   └── README.md
-└── Final_CrossFilter_Dashboard.html # Live Interactive Click-to-Filter Proof
+└── tools/generators/             # Dashboard builder scripts (moved from root)
 ```
 
 ## 🔍 Validation Evidence
 The integrity of this skill is backed by deterministic tests in the proof/ directory:
-- 📈 **Artifacts:** Check proof/examples/ for generated ECharts HTML dashboards, including `Final_CrossFilter_Dashboard.html` demonstrating two-way Click-to-Filter (e.g. click Bandung -> entire dashboard updates to Bandung).
+- 📈 **Artifacts:** Check proof/examples/ for generated ECharts HTML dashboards, including `data-analyst-visualization-skill/proof/examples/Final_CrossFilter_Dashboard.html` demonstrating two-way Click-to-Filter (e.g. click Bandung -> entire dashboard updates to Bandung).
 - 🛡️ **Anti-Slop Rulebook:** Reference `assets/anti-slop/` for zero-slop UI, copy, and code standards.
 - ⚙️ **Logs:** Check proof/runners/ for SQL and Forecast execution logs proving the analytical rigor.
 - 💾 **Data:** Check proof/fixtures/ for synthetic datasets (e.g., many_to_many.csv).
