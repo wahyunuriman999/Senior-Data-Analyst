@@ -26,7 +26,7 @@ To guarantee consistency with the README expectations, you MUST adhere to this e
 ### 2. Layout Density & Structure
 - **No Wasted Space & BENTO-BOX LAYOUT**: NEVER stack giant, full-width stretched charts on top of each other. You MUST use a "Bento-Box" modular grid layout (e.g., 3-4 columns). 
 - **SaaS Anatomy**: Every HTML mockup MUST include a Sidebar Navigation, a Top Navbar, a row of modular KPI cards, and multiple compact chart widgets. It must look like a complete, compiled software interface, matching the complex 10-dashboard artifacts.
-- **AI Insight Sidebar**: Every dashboard MUST include a dedicated panel where the AI Auto-Critique (Phase F) writes out its findings (e.g., anomalies, drop-off rates).
+- **Fakta Terverifikasi Panel**: Every dashboard MUST include a dedicated panel of computed facts only. Each fact shows the number PLUS the exact formula/rule that produced it. NO AI persona, NO narrative sentences, NO causal claims.
 
 ### 3. Glassmorphism & Cinematic Overrides (When Max Complexity is Needed)
 If the data requires deep relational focus (e.g., Sankey, Market Basket):
