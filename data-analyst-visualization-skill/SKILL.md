@@ -27,15 +27,15 @@ Consult these subsystems when executing tasks:
 ## MANDATORY MAXIMALIST OUTPUT SPECIFICATION
 When the user asks you to "create a dashboard", "generate a mockup", or "visualize the result", you MUST default to the **Apex Maximalist Standard**. Never deliver a basic/boring output. Your output must guarantee:
 1. **Advanced Visual Grammar**: Do not settle for basic Bar/Line charts. Default to Sankey Flow diagrams for N:M relationships, Density Hexbins for heavy scatter data, and Cohort Heatmaps for retention.
-2. **AI Data Storyteller Panel**: Always integrate a dedicated side-panel in the UI where you (the AI) provide auto-critique, detect anomalies, and summarize causal insights (simulating Phase E & F).
+2. **Fakta Terverifikasi Panel**: Always integrate a dedicated side-panel containing ONLY computed facts. Every fact MUST display the number PLUS the exact formula/rule that produced it (e.g. "Dekomposisi Rp 7,85 M → Harga −8,8 · Volume +14,11 · Mix +2,54 · residu Rp 0"). NO AI persona, NO narrative sentences, NO causal claims. A finding that cannot show its formula does not ship.
 3. **Target Zones & Mathematical Annotations**: Inject mathematical context directly into charts (e.g., Structural Break lines, Target Zones, Ratio lines, 95% Confidence Intervals, markAreas).
-4. **Cinematic Dark Glassmorphism Theme**: Default to a high-end UI featuring dark backgrounds (#050505), glassmorphism panels (ackdrop-filter), neon accents (Cyan/Purple/Pink), and monospace data fonts.
+4. **Premium Dark Enterprise Theme**: Default to a refined dark UI — app background #0A0F1E, cards #111A30 / #182238, hairline borders #26314D. NO neon gradients, NO gamer glow, NO rainbow palettes. Data colors: base #5B8DEF, positive #34B98A, negative #E0605F, secondary #E8A54B / #8C9BDB (exact tokens in `design/tokens.json`). Monospace numerals (JetBrains Mono stack). Restraint reads as premium; decoration reads as slop.
 ---
 # 🛑 ABSOLUTE CONSTRAINTS & ZERO-TOLERANCE RULES (CRITICAL)
 If you violate any of these rules, your output is considered a **FATAL FAILURE**.
-1. **NEVER** use white or light backgrounds unless explicitly demanded by the user. The background MUST be #0B1120 or #050505.
-2. **NEVER** use basic rainbow color palettes. You MUST use the exact semantic hex codes: #3B82F6 (Base), #10B981 (Positive), #EF4444 (Negative).
-3. **NEVER** generate a chart without an AI Data Storyteller / Insight Panel explaining the anomalies.
+1. **NEVER** use white or light backgrounds unless explicitly demanded by the user. The background MUST be #0A0F1E (token `color.bg.app` in `design/tokens.json`).
+2. **NEVER** use basic rainbow color palettes or neon gradients. You MUST use the exact token hex codes from `design/tokens.json`: #5B8DEF (Base), #34B98A (Positive), #E0605F (Negative), #E8A54B / #8C9BDB (Secondary).
+3. **NEVER** ship a dashboard without a Fakta Terverifikasi panel. Every fact MUST display its formula/rule. Narrative AI analysis without a shown formula is a **FATAL FAILURE**.
 4. **NEVER** output a sparse, empty layout. The layout MUST be dense, enterprise-grade, and mirror the 10 reference images in the README.
 
 ### 📋 MANDATORY PRE-FLIGHT CHECKLIST (YOU MUST OUTPUT THIS BEFORE ANY CODE/MOCKUP)
@@ -84,7 +84,7 @@ Dashboards are Decision Systems, not paintings. You must guarantee Metric Reconc
 You MUST adhere to the **Anti-Slop Rulebook** (`assets/anti-slop/` by Miqdad Badjuber):
 1. **ZERO AI SLOP & FILLER COPY**: Never use generic hype phrases (e.g., "Next-gen synergy", "Elevate insights", "Unlocking potential"). Use plain, honest, domain-specific terminology.
 2. **NO INVENTED DATA OR METRIC HALLUCINATION**: Every number presented must have a real or clearly declared deterministic data source. Never invent vanity metrics to fill white space.
-3. **RESTRAINED, HONEST VISUAL DESIGN**: No rainbow gradients, no 3D decorations, no gamer glow, no chart junk. Use high-contrast, functional typography (Inter, JetBrains Mono) with semantic roles (Emerald for positive, Rose for negative, Slate for neutral).
+3. **RESTRAINED, HONEST VISUAL DESIGN**: No rainbow gradients, no 3D decorations, no gamer glow, no neon, no chart junk. Use high-contrast, functional typography (Inter, JetBrains Mono) with semantic roles (#34B98A for positive, #E0605F for negative, #8E97AD for neutral). Restraint reads as premium.
 4. **PURE SIGNAL CODE**: Avoid noisy ASCII section banners or redundant comments that merely repeat code. Keep code direct, robust, and accessible.
 
 ---
@@ -93,7 +93,7 @@ Every dashboard created using this skill MUST implement an interactive Header Sl
 
 ### 1. Mandatory Header Slicer Bar
 * **Prominent Header Placement**: The primary filter/slicer controls MUST be anchored directly in the **Dashboard Header / Subheader bar** (Sticky at the top). Filters must never be hidden inside unsearchable nested menus.
-* **Core Slicer Dimensions**: Provide immediate controls for primary dimensions (e.g., Kota/Region, Kategori, Periode).
+* **Core Slicer Dimensions**: Provide immediate controls for ALL primary dimensions (e.g., Kota/Region, Kategori, Bulan, Periode) — never just one or two. A scope summary MUST show the active coverage, e.g. `Cakupan: Bandung · Fashion · Okt 26 · 12 bulan · 240 baris data`.
 * **Active Filter State & Chips**: When a filter is active, display clear removable filter chips (e.g., `[ 📍 Kota: Bandung ✕ ]`) right in the header bar.
 * **Instant Reset**: Always provide a prominent `[ Reset / Clear All ]` button in the header that resets all filters back to consolidated national/global state.
 
@@ -109,3 +109,8 @@ Every dashboard created using this skill MUST implement an interactive Header Sl
   * **Visual Focus & Dimming**: In the clicked chart, the selected element is highlighted, while non-selected elements are dimmed (opacity ~0.35) so the user maintains visual context.
   * **Toggle Off / Unfilter**: Clicking the selected element a second time, or clicking the chip's `✕`, or clicking "Clear All" in the header MUST instantly restore the consolidated (All) dashboard view.
 * **Single Source of Truth (SSOT)**: Cross-filtering MUST filter the raw customer/transaction dataset and recalculate metrics mathematically (`SUM(Profit)/SUM(Revenue)`). Never use hardcoded disjointed arrays!
+
+### 3. Click-to-Filter on Every Dimension-Based Visualization
+
+* Bar, donut, and table clicks are the baseline. You MUST also wire every other visualization whose elements represent filterable dimensions: trend-line points → time/month filter, Sankey nodes → their own dimension (city node → city filter, category node → category filter).
+* **HONEST EXCEPTION**: elements that are NOT data dimensions (e.g. waterfall decomposition components, cohort-matrix cells) cannot map to a filter. Do NOT fake clickability — label the card honestly (e.g. "komponen bukan dimensi filter").

@@ -59,8 +59,12 @@ The architecture is **fully implemented** and **deterministically validated** th
 | 🎨 **Visualization Engine**| Grammar Selection, Semantic Encodings | 🟢 ARTIFACTS GENERATED |
 | 🛡️ **Quality (QA) Gate** | Q-DATA-001 to Q-STORY-005 Operational Checks | 🟢 IMPLEMENTED |
 | 🛡️ **Anti-Slop Engine** | Rulebook `assets/anti-slop` Integrated | 🟢 ACTIVE |
-| 🎛️ **Header Slicer & Cross-Filter** | Click-to-Filter Auto Synced Dashboard | 🟢 IMPLEMENTED |
+| 🎛️ **Header Slicer & Cross-Filter** | Click-to-Filter on Every Dimension Viz | 🟢 IMPLEMENTED |
+| ✅ **Fakta Terverifikasi** | Facts + formulas, no AI persona (v2) | 🟢 IMPLEMENTED |
+| 🎨 **Design Tokens** | `design/tokens.json` machine-readable | 🟢 IMPLEMENTED |
+| 🔍 **Validator** | `validator/apex_validate.py` — 12 static checks | 🟢 PASSING |
 | 🧪 **Behavioral Proofs** | 20 Adversarial Cases (Fixtures Ready) | 🟡 LLM PENDING |
+| 🤖 **LLM-Following-Skill Proof** | 2026-10-06: AI-built dashboard, 15/15 tests | 🟢 PASS |
 
 ---
 
@@ -72,10 +76,15 @@ Senior-Data-Analyst/
 │   ├── anti-slop/      # Anti-Slop Rulebook & Plugins (by Miqdad Badjuber)
 │   └── *.jpg           # 10 Reference Apex Visualizations
 ├── data-analyst-visualization-skill/
-│   ├── SKILL.md        # Entry Point for AI Agent (Anti-Slop & Click-to-Filter Enforced)
-│   ├── design/         # Slicer Bar & Cross-Filtering Protocol
-│   ├── quality/        # Q-VIS-FATAL, Q-VIS-ANALYTICAL & Q-VIS-INTERACTION
-│   └── proof/examples/ # Fully Reconciled ECharts Dashboards
+│   ├── SKILL.md        # Entry Point for AI Agent (v2: Fakta Terverifikasi, universal click-to-filter)
+│   ├── design/         # Theme, tokens.json, Slicer & Cross-Filtering Protocol
+│   ├── quality/        # Layered QA Matrices, Self-Critique Loop, QA Engine
+│   └── proof/
+│       ├── examples/       # Fully Reconciled ECharts Dashboards
+│       └── llm-validation/ # 2026-10-06: AI-following-skill proof (report + 15/15 tests)
+├── validator/
+│   ├── apex_validate.py # 12 machine-checkable compliance checks (stdlib only)
+│   └── README.md
 └── Final_CrossFilter_Dashboard.html # Live Interactive Click-to-Filter Proof
 ```
 
@@ -86,6 +95,8 @@ The integrity of this skill is backed by deterministic tests in the proof/ direc
 - ⚙️ **Logs:** Check proof/runners/ for SQL and Forecast execution logs proving the analytical rigor.
 - 💾 **Data:** Check proof/fixtures/ for synthetic datasets (e.g., many_to_many.csv).
 - 📜 **Benchmarks:** Read proof/behavioral-benchmarks.md for the strict status of all 20 scenarios.
+- 🤖 **LLM-following-skill proof:** Read proof/llm-validation/REPORT_2026-10-06.md — an AI followed this skill end-to-end and produced a verified dashboard (15/15 executable tests, 12/12 validator checks).
+- 🔍 **Validate any dashboard:** `python3 validator/apex_validate.py <file.html>`.
 
 ---
 <div align="center">
