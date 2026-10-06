@@ -24,6 +24,16 @@ Consult these subsystems when executing tasks:
 - **Phase F (Quality)**: `quality/` (5-Layer QA, Self-Critique Schema)
 - **Phase G & H (Proof)**: `proof/` (Behavioral Benchmarks)
 
+## EXECUTABLE ENGINE (PREFER OVER HAND-BUILDING)
+`tools/apex/apex_generate.py` is this skill compiled into code: CSV/demo-data
+→ single self-contained dashboard HTML that already satisfies the v2 mandates
+(Fakta Terverifikasi, universal click-to-filter, zero-CDN, v2 palette,
+12/12 validator). When the task fits its input schema
+(`period,dim1,dim2,units,revenue,cost[,discount]`), **run the engine instead
+of hand-writing a dashboard** — then verify with
+`validator/apex_validate.py`. Hand-build only when the requirement exceeds
+the engine (custom grammars, multi-page, non-standard data shapes).
+
 ## MANDATORY MAXIMALIST OUTPUT SPECIFICATION
 When the user asks you to "create a dashboard", "generate a mockup", or "visualize the result", you MUST default to the **Apex Maximalist Standard**. Never deliver a basic/boring output. Your output must guarantee:
 1. **Advanced Visual Grammar**: Do not settle for basic Bar/Line charts. Default to Sankey Flow diagrams for N:M relationships, Density Hexbins for heavy scatter data, and Cohort Heatmaps for retention.

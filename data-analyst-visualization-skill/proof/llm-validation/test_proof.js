@@ -4,9 +4,16 @@
  * Exit 0 = semua PASS, exit 1 = ada FAIL. */
 "use strict";
 const fs = require("fs");
-const BASE = "/home/hatch/workspace/apex-proof";
-const DATA = JSON.parse(fs.readFileSync(BASE + "/data.json", "utf8"));
-const APP = fs.readFileSync(BASE + "/dashboard.js", "utf8");
+const path = require("path");
+// Self-contained: DATA + CFG + APP diekstrak dari artefak HTML yang diuji
+// (file co-located). Tanpa path absolut — jalan dari fresh clone.
+const finalHTML = fs.readFileSync(path.join(__dirname, "apex_skill_proof_dashboard.html"), "utf8");
+const _scripts = [...finalHTML.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
+const _dataSrc = _scripts.find(s => s.includes("window.APEX_DATA"));
+const _cfgSrc = _scripts.find(s => s.includes("window.APEX_CFG"));
+const DATA = JSON.parse(_dataSrc.match(/window\.APEX_DATA = (\{[\s\S]*\});/)[1]);
+const CFG = _cfgSrc ? JSON.parse(_cfgSrc.match(/window\.APEX_CFG = (\{[\s\S]*\});/)[1]) : {}; // artefak pra-CFG: default app berlaku
+const APP = _scripts[_scripts.length - 1]; // blok <script> terakhir = app JS
 
 // ---------- fake DOM ----------
 const els = {};
@@ -28,6 +35,7 @@ global.document = {
 // window === global (seperti browser), supaya window.echarts & window.APEX_DATA terlihat
 global.window = global;
 global.APEX_DATA = DATA;
+global.APEX_CFG = CFG;
 global.addEventListener = () => {};
 
 // ---------- fake echarts: tangkap setOption + click handler ----------
@@ -137,7 +145,6 @@ check("10 chart instance ter-render", need.every(id => chartOpts[id]),
   "missing=" + need.filter(id => !chartOpts[id]).join(","));
 
 // 7. Zero network request di HTML final (URL di komentar lisensi/SVG namespace dikecualikan)
-const finalHTML = fs.readFileSync("/home/hatch/workspace/your_files/apex_skill_proof_dashboard.html", "utf8");
 const netLoad = (finalHTML.match(/(src|href)="https?:[^"]*"|fetch\(\s*["']https?:|@import[^;]*|url\(\s*["']?https?:|<script[^>]+src=|<link[^>]+href="http/g) || []).length;
 check("Zero network request di HTML final", netLoad === 0, netLoad + " pola pemuatan jaringan");
 
