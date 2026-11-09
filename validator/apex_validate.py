@@ -121,6 +121,48 @@ def check_v_ssot(html):
     return ok, f"filter() usage={has_filter}, SSOT marker={has_ssot_marker}"
 
 
+def check_v_formula(html):
+    """V-FORMULA (F-00/F-01/F-03/F-08): facts show median, P90, AOV, backtest.
+
+    v3: a mean is never reported alone, AOV is recomputed from grain, and
+    every forecast ships with its backtest. All four markers must be in
+    the generated dashboard's fact logic.
+    """
+    low = html.lower()
+    markers = {"median": "median" in low, "P90": "p90" in low,
+               "AOV": "aov" in low, "backtest": "backtest" in low}
+    missing = [k for k, v in markers.items() if not v]
+    return not missing, "fact markers ok" if not missing else "missing: " + ",".join(missing)
+
+
+def check_v_growth_na(html):
+    """V-GROWTH-NA (F-02): zero-base growth is n/a, never 0%.
+
+    The engine must contain the null-returning div0 and the "basis 0"
+    display string; a `... : 0` fallback on the growth path is the bug.
+    """
+    has_null_div0 = bool(re.search(r"\(a - b\) / b : null", html))
+    has_na_label = "basis 0" in html
+    ok = has_null_div0 and has_na_label
+    return ok, f"null div0={has_null_div0}, n/a label={has_na_label}"
+
+
+def check_v_forecast_t(html):
+    """V-FORECAST-T (F-08): t-based prediction interval, dynamic labels.
+
+    Fails on the v2 bug pattern `f ± 1.96*sigma` and on hardcoded future
+    month labels; requires the t-critical helper + derived labels.
+    """
+    low = html.lower()
+    has_z_bug = bool(re.search(r"1\.96\s*\*\s*sigma", low))
+    has_hardcoded = '["Nov 26", "Des 26", "Jan 27"]' in html
+    has_t = "tcrit95" in low
+    has_dyn = "nextmonthlabels" in low
+    ok = (not has_z_bug) and (not has_hardcoded) and has_t and has_dyn
+    detail = f"z-bug={has_z_bug}, hardcoded-labels={has_hardcoded}, tCrit95={has_t}, dynamic-labels={has_dyn}"
+    return ok, detail
+
+
 CHECKS = [
     ("V-DARK", "Q-VIS-000", check_v_dark),
     ("V-PALETTE", "Q-VIS-007", check_v_palette),
@@ -134,6 +176,9 @@ CHECKS = [
     ("V-SLICER", "Q-VIS-HEADER-SLICER", check_v_slicer),
     ("V-MONO", "tokens.json", check_v_mono),
     ("V-SSOT", "Q-VIS-ANALYTICAL", check_v_ssot),
+    ("V-FORMULA", "F-00/F-01/F-03/F-08", check_v_formula),
+    ("V-GROWTH-NA", "F-02", check_v_growth_na),
+    ("V-FORECAST-T", "F-08", check_v_forecast_t),
 ]
 
 

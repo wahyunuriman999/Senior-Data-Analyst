@@ -3,8 +3,11 @@
 
 Each domain returns (rows, cohorts, cfg) where rows use the canonical internal
 schema: kota(=dim1), kategori(=dim2), bulan(=period), units, omzet, cogs,
-diskon_pct, aov_list. Display labels come from cfg. All data is deterministic
+diskon_pct. Display labels come from cfg. All data is deterministic
 (seeded) and declared synthetic.
+
+NOTE (v3, F-03): tidak ada lagi `aov_list` per-baris. AOV = Σ revenue /
+Σ units, dihitung ulang dari grain di dashboard.tpl.js.
 """
 import numpy as np
 
@@ -42,8 +45,7 @@ def synth(p):
                 m = float(np.clip(margin[j] + rng.normal(0, 0.015), 0.05, 0.6))
                 rows.append({"kota": v1, "kategori": v2, "bulan": per, "units": units,
                              "omzet": rev, "cogs": int(round(rev * (1 - m))),
-                             "diskon_pct": round(disc * 100, 1),
-                             "aov_list": int(round(aov_l))})
+                             "diskon_pct": round(disc * 100, 1)})
     # cohorts
     crng = np.random.default_rng(p["seed"] + 999)
     sizes, mat = [], []

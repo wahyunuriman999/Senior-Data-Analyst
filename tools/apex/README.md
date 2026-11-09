@@ -27,7 +27,7 @@ python3 tools/apex/apex_generate.py --list-domains   # finance sales marketing
 python3 tools/apex/apex_generate.py --csv data.csv --config cfg.json --out out.html
 
 # 3. Validate:
-python3 validator/apex_validate.py out.html   # expect 12/12
+python3 validator/apex_validate.py out.html   # expect 15/15
 ```
 
 ## CSV schema
