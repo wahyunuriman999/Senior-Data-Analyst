@@ -14,4 +14,4 @@ Reference scores: `apex_bento_dashboard.html` → **4/12** on
 `validator/apex_validate.py`.
 
 Kept for history, not as reference. The current reference set is
-`../v2/` (engine-generated, 15/15) and `../llm-validation/`.
+`../v2/` (engine-generated, 16/16) and `../llm-validation/`.

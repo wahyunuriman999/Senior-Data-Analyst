@@ -11,14 +11,38 @@
 html{background:var(--bg)}
 body{background:var(--bg);color:var(--tx);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:13px}
 #app{display:flex;min-height:100vh}
-.sidebar{width:216px;flex:none;background:#0C1327;border-right:1px solid var(--bd);padding:18px 12px;position:sticky;top:0;height:100vh}
-.brand{font-weight:800;font-size:15px;letter-spacing:.4px;margin:2px 8px 4px}
-.brand small{display:block;font-weight:400;color:var(--mut);font-size:10.5px;letter-spacing:.2px;margin-top:2px}
-.nav{margin-top:14px;display:flex;flex-direction:column;gap:2px}
-.nav a{color:var(--mut);text-decoration:none;padding:9px 10px;border-radius:8px;font-size:12.5px;display:block}
-.nav a:hover{background:var(--card2);color:var(--tx)}
-.nav a.on{background:var(--card2);color:var(--tx);border-left:3px solid var(--blue)}
-.side-foot{margin-top:18px;padding:10px;font-size:10.5px;color:var(--mut);border:1px dashed var(--bd);border-radius:8px;line-height:1.5}
+.sidebar{width:248px;flex:none;background:#0C1327;border-right:1px solid var(--bd);padding:16px 12px 12px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;z-index:60}
+.brand{display:flex;align-items:center;gap:10px;padding:2px 8px 14px;border-bottom:1px solid var(--bd)}
+.brand-mark{flex:none;width:36px;height:36px;border-radius:10px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;letter-spacing:.5px}
+.brand-name{font-weight:800;font-size:13px;letter-spacing:.4px;line-height:1.25;min-width:0}
+.brand-name small{display:block;font-weight:400;color:var(--mut);font-size:10.5px;letter-spacing:.2px}
+.brand-collapse{margin-left:auto;flex:none;width:26px;height:26px;border-radius:7px;border:1px solid var(--bd);background:transparent;color:var(--mut);cursor:pointer;font-size:13px;line-height:1}
+.brand-collapse:hover{background:var(--card2);color:var(--tx)}
+.nav{margin-top:10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;flex:1;min-height:0}
+.nav-group-label{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--mut);padding:14px 10px 6px;white-space:nowrap}
+.nav-item{display:flex;align-items:center;gap:10px;color:var(--mut);text-decoration:none;padding:7px 10px;border-radius:8px;font-size:12.5px;border-left:3px solid transparent;white-space:nowrap}
+.nav-item:hover{background:var(--card2);color:var(--tx)}
+.nav-item.on{background:rgba(91,141,239,.14);color:var(--tx);border-left-color:var(--blue);font-weight:600}
+.nav-ico{flex:none;width:28px;height:28px;border-radius:8px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:14px}
+.nav-item.on .nav-ico{background:var(--blue)}
+.nav-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.nav-badge{flex:none;font-size:10px;font-weight:700;font-family:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;background:var(--card2);border:1px solid var(--bd);color:var(--mut);border-radius:10px;padding:2px 7px}
+.nav-item.on .nav-badge{background:rgba(91,141,239,.25);border-color:var(--blue);color:var(--tx)}
+.side-user{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px;border-top:1px solid var(--bd)}
+.side-avatar{flex:none;width:32px;height:32px;border-radius:50%;background:var(--card2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--tx)}
+.side-user-meta{flex:1;min-width:0;line-height:1.35}
+.side-user-meta b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.side-user-meta span{font-size:10.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.side-ver{flex:none;font-size:10px;font-weight:700;color:var(--mut);border:1px solid var(--bd);border-radius:10px;padding:2px 7px}
+#app.rail .sidebar{width:68px;padding:16px 8px 12px}
+#app.rail .brand-name,#app.rail .nav-group-label,#app.rail .nav-label,#app.rail .nav-badge,#app.rail .side-user-meta,#app.rail .side-ver{display:none}
+#app.rail .brand{justify-content:center;padding:2px 0 14px}
+#app.rail .brand-collapse{margin-left:0}
+#app.rail .nav-item{justify-content:center;padding:7px 0;border-left-width:0}
+#app.rail .side-user{justify-content:center;padding:10px 0}
+.nav-item:focus-visible,.brand-collapse:focus-visible,#btn-sidebar-menu:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+#btn-sidebar-menu{display:none}
+#sidebar-backdrop{display:none}
 .main{flex:1;min-width:0;padding:18px 20px 30px}
 .topbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
 .topbar h1{font-size:19px;font-weight:800}
@@ -69,26 +93,44 @@ tbody tr.sel{background:rgba(91,141,239,.12)}
 .hint{font-size:10.5px;color:var(--mut);margin-top:8px}
 footer{margin-top:16px;color:var(--mut);font-size:11px;line-height:1.7;border-top:1px solid var(--bd);padding-top:12px}
 @media(max-width:1100px){.content{grid-template-columns:1fr}.story{position:static;max-height:none}
-.s4,.s6,.s8{grid-column:span 12}.kpis{grid-template-columns:repeat(2,1fr)}.sidebar{display:none}}
+.s4,.s6,.s8{grid-column:span 12}.kpis{grid-template-columns:repeat(2,1fr)}
+#btn-sidebar-menu{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer;font-size:16px}
+.sidebar{position:fixed;left:0;top:0;bottom:0;transform:translateX(-105%);transition:transform .18s ease;box-shadow:0 0 40px rgba(0,0,0,.5)}
+#app.drawer-open .sidebar{transform:none}
+#app.drawer-open #sidebar-backdrop{display:block;position:fixed;inset:0;background:rgba(4,7,16,.6);z-index:55}}
+@media(prefers-reduced-motion:reduce){.sidebar{transition:none}}
 </style>
 </head>
 <body>
 
 <div id="app">
-  <aside class="sidebar">
-    <div class="brand">🦅 APEX ANALYST<small>Apex Standard v2</small></div>
-    <nav class="nav">
-      <a href="#sec-tren" class="on">📈 Tren &amp; Forecast</a>
-      <a href="#sec-var">🧮 Dekomposisi Varians</a>
-      <a href="#sec-kohort">🗺️ Kohort &amp; Alur</a>
-      <a href="#sec-wilayah">📍 Site &amp; Shift</a>
-      <a href="#sec-tabel">🗂️ Tabel Site</a>
-      <a href="#sec-insight">✓ Fakta Terverifikasi</a>
+  <aside class="sidebar" id="sidebar" aria-label="Navigasi dashboard">
+    <div class="brand">
+      <span class="brand-mark">AX</span>
+      <span class="brand-name">APEX ANALYST<small>Apex Standard v2</small></span>
+      <button id="btn-sidebar-collapse" class="brand-collapse" type="button" aria-label="Ciutkan sidebar" aria-expanded="true" title="Ciutkan sidebar">«</button>
+    </div>
+    <nav class="nav" aria-label="Bagian dashboard">
+      <div class="nav-group-label">Analisis</div>
+      <a href="#sec-tren" class="nav-item on" title="Tren &amp; Forecast"><span class="nav-ico">📈</span><span class="nav-label">Tren &amp; Forecast</span><span class="nav-badge">12</span></a>
+      <a href="#sec-var" class="nav-item" title="Dekomposisi Varians"><span class="nav-ico">🧮</span><span class="nav-label">Dekomposisi Varians</span></a>
+      <a href="#sec-kohort" class="nav-item" title="Kohort &amp; Alur"><span class="nav-ico">🗺️</span><span class="nav-label">Kohort &amp; Alur</span></a>
+      <div class="nav-group-label">Data</div>
+      <a href="#sec-wilayah" class="nav-item" title="Site &amp; Shift"><span class="nav-ico">📍</span><span class="nav-label">Site &amp; Shift</span></a>
+      <a href="#sec-tabel" class="nav-item" title="Tabel Site"><span class="nav-ico">🗂️</span><span class="nav-label">Tabel Site</span><span class="nav-badge">5</span></a>
+      <div class="nav-group-label">Verifikasi</div>
+      <a href="#sec-insight" class="nav-item" title="Fakta Terverifikasi"><span class="nav-ico">✓</span><span class="nav-label">Fakta Terverifikasi</span></a>
     </nav>
-    <div class="side-foot">Standar: Apex v2<br>File: 100% mandiri (tanpa CDN)<br>Engine: tools/apex</div>
+    <div class="side-user">
+      <span class="side-avatar">A</span>
+      <span class="side-user-meta"><b>Analyst</b><span>Apex Standard v2</span></span>
+      <span class="side-ver">v2</span>
+    </div>
   </aside>
+  <div id="sidebar-backdrop"></div>
   <div class="main">
     <div class="topbar">
+      <button id="btn-sidebar-menu" type="button" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="sidebar">☰</button>
       <h1>Operational Network — Anomaly Detection</h1>
       <span class="badge syn">DATA SINTETIS</span>
       <span class="badge">Nov 2025 – Okt 2026</span>
@@ -944,6 +986,81 @@ function renderAll() {
     " · " + rows.length + " " + L.rows;
 }
 
+/* ---------------- sidebar v2: rail, drawer, scrollspy ----------------
+ * Tanpa DOMContentLoaded (script ini dieksekusi di akhir body, DOM sudah
+ * ada). Semua akses DOM di-guarded: dashboard tanpa sidebar tetap jalan.
+ * State rail disimpan di localStorage; gagal baca/tulis (private mode)
+ * tidak boleh mematikan render chart. */
+function initSidebar() {
+  var app = document.getElementById("app");
+  var sb = document.getElementById("sidebar");
+  if (!app || !sb) return;
+  var KEY = "apex-sidebar-rail";
+  var collapseBtn = document.getElementById("btn-sidebar-collapse");
+  var menuBtn = document.getElementById("btn-sidebar-menu");
+  var backdrop = document.getElementById("sidebar-backdrop");
+  var links = Array.prototype.slice.call(sb.querySelectorAll(".nav-item"));
+  function setActive(link) {
+    links.forEach(function (a) { a.classList.remove("on"); });
+    if (link) link.classList.add("on");
+  }
+  function sectionEl(link) {
+    var id = (link.getAttribute("href") || "").slice(1);
+    var el = id ? document.getElementById(id) : null;
+    // #sec-kohort memakai display:contents (tidak punya box): pakai anaknya.
+    if (el && window.getComputedStyle(el).display === "contents") el = el.firstElementChild;
+    return el;
+  }
+  try {
+    if (window.localStorage && localStorage.getItem(KEY) === "1") {
+      app.classList.add("rail");
+      if (collapseBtn) {
+        collapseBtn.setAttribute("aria-expanded", "false");
+        collapseBtn.textContent = "»";
+        collapseBtn.title = "Bentangkan sidebar";
+      }
+    }
+  } catch (e) { /* private mode: abaikan, rail default mati */ }
+  if (collapseBtn) collapseBtn.addEventListener("click", function () {
+    var rail = app.classList.toggle("rail");
+    collapseBtn.setAttribute("aria-expanded", rail ? "false" : "true");
+    collapseBtn.textContent = rail ? "»" : "«";
+    collapseBtn.title = rail ? "Bentangkan sidebar" : "Ciutkan sidebar";
+    try { if (window.localStorage) localStorage.setItem(KEY, rail ? "1" : "0"); } catch (e) {}
+  });
+  function closeDrawer() {
+    app.classList.remove("drawer-open");
+    if (menuBtn) menuBtn.setAttribute("aria-expanded", "false");
+  }
+  if (menuBtn) menuBtn.addEventListener("click", function () {
+    var open = app.classList.toggle("drawer-open");
+    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  if (backdrop) backdrop.addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key === "Escape") closeDrawer();
+  });
+  links.forEach(function (a) {
+    a.addEventListener("click", function () { setActive(a); closeDrawer(); });
+  });
+  // Scrollspy: section yang sedang dibaca jadi .on. rAF-throttle.
+  var ticking = false;
+  function spy() {
+    ticking = false;
+    var best = null, bestTop = -Infinity;
+    links.forEach(function (a) {
+      var el = sectionEl(a);
+      if (!el) return;
+      var top = el.getBoundingClientRect().top;
+      if (top <= 140 && top > bestTop) { best = a; bestTop = top; }
+    });
+    if (best) setActive(best);
+  }
+  window.addEventListener("scroll", function () {
+    if (!ticking) { ticking = true; window.requestAnimationFrame(spy); }
+  }, { passive: true });
+}
+
 /* ---------------- init (tanpa DOMContentLoaded — Q-VIS-FATAL) ---------------- */
 (function init() {
   var sk = document.getElementById("sel-kota");
@@ -957,6 +1074,7 @@ function renderAll() {
   sb.addEventListener("change", function () { state.bulan = this.value; renderAll(); });
   document.getElementById("sel-periode").addEventListener("change", function () { state.periode = this.value; renderAll(); });
   document.getElementById("btn-reset").addEventListener("click", resetAll);
+  initSidebar();
   window.addEventListener("resize", function () {
     Object.keys(charts).forEach(function (id) { charts[id].resize(); });
   });

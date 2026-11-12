@@ -163,6 +163,30 @@ def check_v_forecast_t(html):
     return ok, detail
 
 
+def check_v_sidebar(html):
+    """V-SIDEBAR (design/sidebar.md): grouped nav, active state, collapse,
+    mobile drawer — and the nav must never be hidden with display:none.
+
+    The v2 sidebar it replaces had 6 flat emoji links, no groups, no
+    collapse control, and vanished entirely below 1100px.
+    """
+    has_aside = bool(re.search(r'<aside[^>]+class="sidebar"', html))
+    groups = len(re.findall(r'class="nav-group-label"', html))
+    has_active = bool(re.search(r'class="nav-item on"', html))
+    has_collapse = 'id="btn-sidebar-collapse"' in html
+    has_burger = 'id="btn-sidebar-menu"' in html
+    has_drawer = "drawer-open" in html and 'id="sidebar-backdrop"' in html
+    no_hide = not bool(re.search(r'\.sidebar\s*\{[^}]*display\s*:\s*none', html))
+    badges = len(re.findall(r'class="nav-badge"', html))
+    ok = (has_aside and groups >= 2 and has_active and has_collapse
+          and has_burger and has_drawer and no_hide and badges >= 1)
+    detail = (f"aside={has_aside}, groups={groups}, active={has_active}, "
+              f"collapse={has_collapse}, burger={has_burger}, "
+              f"drawer={has_drawer}, no-display-none={no_hide}, "
+              f"badges={badges}")
+    return ok, detail
+
+
 CHECKS = [
     ("V-DARK", "Q-VIS-000", check_v_dark),
     ("V-PALETTE", "Q-VIS-007", check_v_palette),
@@ -179,6 +203,7 @@ CHECKS = [
     ("V-FORMULA", "F-00/F-01/F-03/F-08", check_v_formula),
     ("V-GROWTH-NA", "F-02", check_v_growth_na),
     ("V-FORECAST-T", "F-08", check_v_forecast_t),
+    ("V-SIDEBAR", "design/sidebar.md", check_v_sidebar),
 ]
 
 

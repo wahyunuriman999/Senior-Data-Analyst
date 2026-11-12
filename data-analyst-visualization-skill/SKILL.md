@@ -29,7 +29,8 @@ Consult these subsystems when executing tasks:
 `tools/apex/apex_generate.py` is this skill compiled into code: CSV/demo-data
 → single self-contained dashboard HTML that already satisfies the v2 mandates
 (Fakta Terverifikasi, universal click-to-filter, zero-CDN, v2 palette,
-15/15 validator). When the task fits its input schema
+Sidebar v2 grouped nav with collapse-to-rail + mobile drawer,
+16/16 validator). When the task fits its input schema
 (`period,dim1,dim2,units,revenue,cost[,discount]`), **run the engine instead
 of hand-writing a dashboard** — then verify with
 `validator/apex_validate.py`. Hand-build only when the requirement exceeds
@@ -41,6 +42,7 @@ When the user asks you to "create a dashboard", "generate a mockup", or "visuali
 2. **Fakta Terverifikasi Panel**: Always integrate a dedicated side-panel containing ONLY computed facts. Every fact MUST display the number PLUS the exact formula/rule that produced it (e.g. "Dekomposisi Rp 7,85 M → Harga −8,8 · Volume +14,11 · Mix +2,54 · residu Rp 0"). NO AI persona, NO narrative sentences, NO causal claims. A finding that cannot show its formula does not ship.
 3. **Target Zones & Mathematical Annotations**: Inject mathematical context directly into charts (e.g., Structural Break lines, Target Zones, Ratio lines, 95% Confidence Intervals, markAreas).
 4. **Premium Dark Enterprise Theme**: Default to a refined dark UI — app background #0A0F1E, cards #111A30 / #182238, hairline borders #26314D. NO neon gradients, NO gamer glow, NO rainbow palettes. Data colors: base #5B8DEF, positive #34B98A, negative #E0605F, secondary #E8A54B / #8C9BDB (exact tokens in `design/tokens.json`). Monospace numerals (JetBrains Mono stack). Restraint reads as premium; decoration reads as slop.
+5. **Sidebar v2** (`design/sidebar.md`): every dashboard gets a grouped sidebar — brand block, labelled groups (Analisis / Data / Verifikasi), icon-tile + label items with exactly one active state, honest count badges, collapse-to-rail (68px, persisted), and a mobile drawer below 1100px. Nav is derived from the sections that actually exist; no invented links; never `display:none` the sidebar at any breakpoint.
 ---
 # 🛑 ABSOLUTE CONSTRAINTS & ZERO-TOLERANCE RULES (CRITICAL)
 If you violate any of these rules, your output is considered a **FATAL FAILURE**.

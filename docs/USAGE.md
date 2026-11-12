@@ -57,7 +57,7 @@ python3 tools/apex/apex_generate.py --csv data.csv --config cfg.json --out dashb
 # or a synthetic demo domain
 python3 tools/apex/apex_generate.py --demo marketing --out marketing.html
 
-# validate (expect 15/15)
+# validate (expect 16/16)
 python3 validator/apex_validate.py dashboard.html
 ```
 
@@ -68,7 +68,7 @@ and labeled as such in the output.
 
 Per `SKILL.md` §QA, a dashboard is done only when:
 
-- `validator/apex_validate.py` → 15/15
+- `validator/apex_validate.py` → 16/16
 - every number traceable to the filtered row set (SSOT)
 - every dimensional visual is click-to-filter (with the two documented
   exceptions: waterfall components, cohort cells)

@@ -27,7 +27,7 @@ python3 tools/apex/apex_generate.py --list-domains   # finance sales marketing
 python3 tools/apex/apex_generate.py --csv data.csv --config cfg.json --out out.html
 
 # 3. Validate:
-python3 validator/apex_validate.py out.html   # expect 15/15
+python3 validator/apex_validate.py out.html   # expect 16/16
 ```
 
 ## CSV schema
@@ -61,6 +61,30 @@ Omit `--config` and a generic one is inferred from the CSV
 Without cohort data the cohort heatmap is skipped automatically
 (demo domains always include synthetic cohorts).
 
+## Sidebar v2
+
+Every generated dashboard ships the Sidebar v2 nav (`design/sidebar.md`):
+brand block, labelled groups (**Analisis** / **Data** / **Verifikasi**),
+icon-tile + label items, exactly one active item with scrollspy,
+collapse-to-rail (248px → 68px, persisted in `localStorage`), and a mobile
+drawer below 1100px (hamburger in the topbar; backdrop / `Esc` / nav tap
+closes it). Nav is derived from the sections on the page — no invented
+links — and badges show only build-time counts (period count on Tren,
+dim1 value count on Tabel).
+
+Optional `cfg.sidebar` overrides (brand + footer only; groups are derived):
+
+```json
+{"sidebar": {
+  "brand": {"mark": "AX", "name": "APEX ANALYST", "tag": "Apex Standard v2"},
+  "footer": {"user": "Analyst", "role": "Apex Standard v2"}
+}}
+```
+
+Validate with `validator/apex_validate.py` (check `V-SIDEBAR`, 16th) and
+run `data-analyst-visualization-skill/proof/runners/test_sidebar.py` (8 tests,
+no browser).
+
 ## Files
 
 | File | Role |
@@ -68,7 +92,7 @@ Without cohort data the cohort heatmap is skipped automatically
 | `apex_generate.py` | CLI entry point |
 | `demo_data.py` | 10 deterministic synthetic domains (seeded, declared synthetic) |
 | `dashboard.tpl.js` | Generalized dashboard app (SSOT + filters + facts), labels via `APEX_CFG` |
-| `build_page.py` | HTML assembler (v2 shell, palette, layout) |
+| `build_page.py` | HTML assembler (v2 shell, palette, layout, Sidebar v2) |
 | `vendor/` | `echarts.min.js` lives here (not committed; download once) |
 
 ## Design notes

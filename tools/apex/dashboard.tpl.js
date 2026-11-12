@@ -754,6 +754,81 @@ function renderAll() {
     " · " + rows.length + " " + L.rows;
 }
 
+/* ---------------- sidebar v2: rail, drawer, scrollspy ----------------
+ * Tanpa DOMContentLoaded (script ini dieksekusi di akhir body, DOM sudah
+ * ada). Semua akses DOM di-guarded: dashboard tanpa sidebar tetap jalan.
+ * State rail disimpan di localStorage; gagal baca/tulis (private mode)
+ * tidak boleh mematikan render chart. */
+function initSidebar() {
+  var app = document.getElementById("app");
+  var sb = document.getElementById("sidebar");
+  if (!app || !sb) return;
+  var KEY = "apex-sidebar-rail";
+  var collapseBtn = document.getElementById("btn-sidebar-collapse");
+  var menuBtn = document.getElementById("btn-sidebar-menu");
+  var backdrop = document.getElementById("sidebar-backdrop");
+  var links = Array.prototype.slice.call(sb.querySelectorAll(".nav-item"));
+  function setActive(link) {
+    links.forEach(function (a) { a.classList.remove("on"); });
+    if (link) link.classList.add("on");
+  }
+  function sectionEl(link) {
+    var id = (link.getAttribute("href") || "").slice(1);
+    var el = id ? document.getElementById(id) : null;
+    // #sec-kohort memakai display:contents (tidak punya box): pakai anaknya.
+    if (el && window.getComputedStyle(el).display === "contents") el = el.firstElementChild;
+    return el;
+  }
+  try {
+    if (window.localStorage && localStorage.getItem(KEY) === "1") {
+      app.classList.add("rail");
+      if (collapseBtn) {
+        collapseBtn.setAttribute("aria-expanded", "false");
+        collapseBtn.textContent = "»";
+        collapseBtn.title = "Bentangkan sidebar";
+      }
+    }
+  } catch (e) { /* private mode: abaikan, rail default mati */ }
+  if (collapseBtn) collapseBtn.addEventListener("click", function () {
+    var rail = app.classList.toggle("rail");
+    collapseBtn.setAttribute("aria-expanded", rail ? "false" : "true");
+    collapseBtn.textContent = rail ? "»" : "«";
+    collapseBtn.title = rail ? "Bentangkan sidebar" : "Ciutkan sidebar";
+    try { if (window.localStorage) localStorage.setItem(KEY, rail ? "1" : "0"); } catch (e) {}
+  });
+  function closeDrawer() {
+    app.classList.remove("drawer-open");
+    if (menuBtn) menuBtn.setAttribute("aria-expanded", "false");
+  }
+  if (menuBtn) menuBtn.addEventListener("click", function () {
+    var open = app.classList.toggle("drawer-open");
+    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  if (backdrop) backdrop.addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key === "Escape") closeDrawer();
+  });
+  links.forEach(function (a) {
+    a.addEventListener("click", function () { setActive(a); closeDrawer(); });
+  });
+  // Scrollspy: section yang sedang dibaca jadi .on. rAF-throttle.
+  var ticking = false;
+  function spy() {
+    ticking = false;
+    var best = null, bestTop = -Infinity;
+    links.forEach(function (a) {
+      var el = sectionEl(a);
+      if (!el) return;
+      var top = el.getBoundingClientRect().top;
+      if (top <= 140 && top > bestTop) { best = a; bestTop = top; }
+    });
+    if (best) setActive(best);
+  }
+  window.addEventListener("scroll", function () {
+    if (!ticking) { ticking = true; window.requestAnimationFrame(spy); }
+  }, { passive: true });
+}
+
 /* ---------------- init (tanpa DOMContentLoaded — Q-VIS-FATAL) ---------------- */
 (function init() {
   var sk = document.getElementById("sel-kota");
@@ -767,6 +842,7 @@ function renderAll() {
   sb.addEventListener("change", function () { state.bulan = this.value; renderAll(); });
   document.getElementById("sel-periode").addEventListener("change", function () { state.periode = this.value; renderAll(); });
   document.getElementById("btn-reset").addEventListener("click", resetAll);
+  initSidebar();
   window.addEventListener("resize", function () {
     Object.keys(charts).forEach(function (id) { charts[id].resize(); });
   });
