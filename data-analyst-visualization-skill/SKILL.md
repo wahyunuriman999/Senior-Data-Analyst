@@ -30,7 +30,7 @@ Consult these subsystems when executing tasks:
 → single self-contained dashboard HTML that already satisfies the v2 mandates
 (Fakta Terverifikasi, universal click-to-filter, zero-CDN, v2 palette,
 Sidebar v2 grouped nav with collapse-to-rail + mobile drawer,
-16/16 validator). When the task fits its input schema
+17/17 validator). When the task fits its input schema
 (`period,dim1,dim2,units,revenue,cost[,discount]`), **run the engine instead
 of hand-writing a dashboard** — then verify with
 `validator/apex_validate.py`. Hand-build only when the requirement exceeds
@@ -96,11 +96,11 @@ Dashboards are Decision Systems, not paintings. You must guarantee Metric Reconc
 
 ---
 # 🛡️ ANTI-SLOP INTEGRATION (ASSETS/ANTI-SLOP)
-You MUST adhere to the **Anti-Slop Rulebook** (`assets/anti-slop/` by Miqdad Badjuber):
-1. **ZERO AI SLOP & FILLER COPY**: Never use generic hype phrases (e.g., "Next-gen synergy", "Elevate insights", "Unlocking potential"). Use plain, honest, domain-specific terminology.
-2. **NO INVENTED DATA OR METRIC HALLUCINATION**: Every number presented must have a real or clearly declared deterministic data source. Never invent vanity metrics to fill white space.
-3. **RESTRAINED, HONEST VISUAL DESIGN**: No rainbow gradients, no 3D decorations, no gamer glow, no neon, no chart junk. Use high-contrast, functional typography (Inter, JetBrains Mono) with semantic roles (#34B98A for positive, #E0605F for negative, #8E97AD for neutral). Restraint reads as premium.
-4. **PURE SIGNAL CODE**: Avoid noisy ASCII section banners or redundant comments that merely repeat code. Keep code direct, robust, and accessible.
+You MUST adhere to the **Anti-Slop Rulebook** (`assets/anti-slop/` by Miqdad Badjuber, MIT, vendored v3.2.28) as mapped onto this skill in `quality/anti-slop.md` (rules AS-01..AS-21). The four rules that matter most, in one place:
+1. **ZERO AI SLOP & FILLER COPY**: Never use generic hype phrases (e.g., "Next-gen synergy", "Elevate insights", "Unlocking potential"). Use plain, honest, domain-specific terminology. No em dash in dashboard text (AS-01); no hype vocabulary (AS-02).
+2. **NO INVENTED DATA OR METRIC HALLUCINATION**: Every number presented must have a real or clearly declared deterministic data source. Never invent vanity metrics to fill white space. An empty section beats a fabricated one (AS-03).
+3. **RESTRAINED, HONEST VISUAL DESIGN**: No rainbow gradients, no 3D decorations, no gamer glow, no neon, no chart junk. Use high-contrast, functional typography (Inter, JetBrains Mono) with semantic roles (#34B98A for positive, #E0605F for negative, #8E97AD for neutral). Restraint reads as premium. Decoration needs a written purpose; the fixed enterprise layout is the direction, not a template (AS-06..AS-09).
+4. **PURE SIGNAL CODE**: Avoid noisy ASCII section banners or redundant comments that merely repeat code. Keep code direct, robust, and accessible (AS-20). Verify before you deliver (AS-18): validator **V-ANTISLOP** is the 17th check — a dashboard ships only at 17/17.
 
 ---
 # 🎛️ MANDATORY HEADER SLICER & CROSS-FILTERING INTELLIGENCE (CLICK-TO-FILTER PROTOCOL)

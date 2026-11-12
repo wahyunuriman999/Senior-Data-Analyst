@@ -517,7 +517,7 @@ function buildFacts(rows, k, g, vd, anoms, fc) {
 
   if (k.mom) {
     push("Perubahan " + L.revenue + " (" + k.mom.label + ")",
-      fmtIDR(g[n-1].omzet) + " (" + (k.mom.omzet === null ? "n/a — basis 0" : fmtPct(k.mom.omzet)) + ")",
+      fmtIDR(g[n-1].omzet) + " (" + (k.mom.omzet === null ? "n/a (basis 0)" : fmtPct(k.mom.omzet)) + ")",
       "omzet bulan berjalan vs bulan sebelumnya", (k.mom.omzet === null || k.mom.omzet >= 0) ? "pos" : "neg");
   }
   push("Total periode", fmtIDR(k.totalOmzet) + " · margin " +
@@ -526,14 +526,14 @@ function buildFacts(rows, k, g, vd, anoms, fc) {
 
   // F-01 + F-03: mean tidak pernah sendirian; AOV dihitung ulang dari grain.
   var monthly = g.map(function (m) { return m.omzet; });
-  push("Omzet bulanan — median & P90",
+  push("Omzet bulanan: median & P90",
     "median " + fmtIDR(median(monthly)) + " · P90 " + fmtIDR(percentile(monthly, 0.9)),
     "median/P90 dari " + n + " bulan · mean " + fmtIDR(monthly.reduce(function (a, b) { return a + b; }, 0) / n) + " hanya pelengkap", "neu");
   var totRev = sum(rows, function (r) { return r.omzet; });
   var totUnits = sum(rows, function (r) { return r.units; });
   push("AOV (" + L.revenue + " per " + L.units.toLowerCase() + ")",
     fmtIDR(totUnits ? totRev / totUnits : 0),
-    "Σ revenue / Σ units pada cakupan aktif — BUKAN rata-rata AOV per baris (F-03)", "neu");
+    "Σ revenue / Σ units pada cakupan aktif: BUKAN rata-rata AOV per baris (F-03)", "neu");
 
   if (fc && fc.backtest) {
     push("Backtest forecast (3 bln terakhir)",
@@ -574,7 +574,7 @@ function buildFacts(rows, k, g, vd, anoms, fc) {
 
   var r = pearson(g.map(function (m) { return m.diskon; }), g.map(function (m) { return m.omzet; }));
   push("Korelasi diskon–omzet", "r = " + r.toLocaleString(L.locale, { maximumFractionDigits: 2 }),
-    "n=" + n + " bulan, observasional — bukan bukti kausal", "neu");
+    "n=" + n + " bulan, observasional, bukan bukti kausal", "neu");
 
   if (COHORT) {
     var b1 = COHORT.retention.map(function (row) { return row[1]; });

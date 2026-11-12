@@ -2,7 +2,7 @@
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { spawnSync } from 'node:child_process'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -23,7 +23,14 @@ function tree(dir, prefix = '') {
 }
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'antislop-smoke-'))
-const result = spawnSync(process.execPath, [worker], { cwd: tmp, encoding: 'utf8' })
+
+// Every child gets a throwaway home from launch: Bun's os.homedir() ignores a later HOME
+// change, so the worker's global install and --update would write into the real home.
+const home = fs.mkdtempSync(path.join(os.tmpdir(), 'antislop-home-'))
+const env = { ...process.env, HOME: home, USERPROFILE: home }
+for (const k of ['KIMI_CODE_HOME', 'CLINE_DIR', 'XDG_DATA_HOME']) delete env[k]
+
+const result = spawnSync(process.execPath, [worker], { cwd: tmp, env, encoding: 'utf8' })
 console.log('--- worker output ---')
 console.log(result.stdout.trim())
 if (result.status !== 0) console.error('worker stderr:', result.stderr)
@@ -55,6 +62,7 @@ const cliDeps = fs.existsSync(path.join(__dirname, '..', 'node_modules', '@clack
 if (cliDeps) {
   const invalidMode = spawnSync(process.execPath, [path.join(__dirname, '..', 'index.mjs'), '--mode', 'invalid'], {
     cwd: tmp,
+    env,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
   })
@@ -64,17 +72,57 @@ if (cliDeps) {
   }
   const noTty = spawnSync(process.execPath, [path.join(__dirname, '..', 'index.mjs')], {
     cwd: tmp,
+    env,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
   })
   const refused = noTty.status === 1 && /needs a terminal/.test(noTty.stderr)
   console.log('no-terminal run: exit', noTty.status, '| refused:', refused)
   if (!refused) reasons.push(`a no-terminal run should exit 1 and say why, got exit ${noTty.status}`)
+
 } else {
   console.log('no-terminal run: skipped, cli dependencies are not installed')
 }
 
+// cli/skills is a build artifact: prepublishOnly generates it, so a plain checkout has
+// none and the plugin below would read a missing folder.
+if (!fs.existsSync(path.join(__dirname, '..', 'skills'))) {
+  const synced = spawnSync(process.execPath, [path.join(__dirname, 'sync-skills.mjs')], { encoding: 'utf8' })
+  if (synced.status !== 0) reasons.push(`could not build cli/skills: ${synced.stderr.trim()}`)
+}
+
+// The DSH plugin reads the same folders, so a frontmatter edit can break it without
+// any installer change. Load it the way DeepSeek Harness would.
+try {
+  const mod = await import(pathToFileURL(path.join(__dirname, '..', 'dsh', 'index.js')).href)
+  let provider
+  mod.apply({
+    skills: {
+      registerProvider: (make) => {
+        provider = make()
+      },
+    },
+  })
+  const skills = await provider.list()
+  const names = skills.map((s) => s.name).sort()
+  const folders = fs
+    .readdirSync(path.join(__dirname, '..', 'skills'), { withFileTypes: true })
+    .filter((e) => e.isDirectory())
+    .map((e) => e.name)
+    .sort()
+  if (JSON.stringify(names) !== JSON.stringify(folders)) {
+    reasons.push(`the DSH plugin lists ${names.join(', ') || 'nothing'}`)
+  }
+  for (const skill of skills) {
+    const body = await provider.get(skill)
+    if (!body.content.startsWith('---')) reasons.push(`the DSH plugin read no body for ${skill.name}`)
+  }
+} catch (err) {
+  reasons.push(`the DSH plugin failed: ${err.message}`)
+}
+
 fs.rmSync(tmp, { recursive: true, force: true })
+fs.rmSync(home, { recursive: true, force: true })
 console.log('\ncleaned up temp project.')
 
 if (reasons.length > 0) {

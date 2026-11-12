@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 import path from 'node:path'
 import pc from 'picocolors'
-import { intro, outro, select, multiselect, confirm, isCancel, cancel, log, spinner } from '@clack/prompts'
 import { banner } from './lib/banner.mjs'
 import { configureMode } from './lib/settings.mjs'
 import {
   CORE,
   AGENTS,
+  atHome,
   skillSourceDir,
   resolveTargets,
   detectAgents,
@@ -20,10 +20,25 @@ import {
   VERSION,
 } from './lib/install.mjs'
 
+// Filled in by loadPrompts() once main() reaches the wizard. --version, --mode and --update
+// never touch them, so they keep working on a Node the prompts cannot load on.
+let intro, outro, select, multiselect, confirm, isCancel, cancel, log, spinner
+
+// @clack/core needs util.styleText (Node 20.12.0), so a static import would crash an older
+// Node inside node_modules. Check first, then load; keep the number in step with engines.
+async function loadPrompts() {
+  const [major, minor] = process.versions.node.split('.').map(Number)
+  if (major < 20 || (major === 20 && minor < 12)) {
+    console.error(`antislop: the installer needs Node.js 20.12 or newer, and this is ${process.version}. Update Node, then run it again.`)
+    process.exit(1)
+  }
+  ;({ intro, outro, select, multiselect, confirm, isCancel, cancel, log, spinner } = await import('@clack/prompts'))
+}
+
 const EXTRA_SKILLS = [
-  { value: 'antislop-ui', label: 'antislop-ui', hint: 'UI and visual design rules' },
+  { value: 'antislop-ui', label: 'antislop-ui', hint: 'UI and visual design rules, with performance mechanisms' },
   { value: 'antislop-copywriting', label: 'antislop-copywriting', hint: 'copywriting and text rules' },
-  { value: 'antislop-human', label: 'antislop-human', hint: 'accessibility, with the contrast checker' },
+  { value: 'antislop-human', label: 'antislop-human', hint: 'accessibility (WCAG 2.2, affordances), with the contrast checker' },
   { value: 'antislop-layoutmobile', label: 'antislop-layoutmobile', hint: 'responsive layout rules' },
   { value: 'antislop-code', label: 'antislop-code', hint: 'code comment rules' },
 ]
@@ -46,7 +61,7 @@ function printPluginDoors(found) {
   console.log('\nInstalled as a plugin (these keep their own copy, so updating them is separate):')
   for (const p of found) {
     console.log(`  ${p.door.label}${p.version ? ` ${p.version}` : ''}`)
-    console.log(`    ${p.door.update}`)
+    for (const line of p.door.update.split('\n')) console.log(`    ${line}`)
   }
 }
 
@@ -96,6 +111,7 @@ async function main() {
     process.exit(1)
   }
 
+  await loadPrompts()
   console.log(banner())
   intro('Install antislop into your agent setup')
 
@@ -178,6 +194,8 @@ async function main() {
 
   if (pointers.length > 0) {
     log.step('Pointer written to ' + pointers.map((p) => path.basename(p)).join(', '))
+  } else if (location === 'project' && atHome()) {
+    log.warn('This is your home folder, so no pointer was written: one here would load in every project. Run it inside a project for a pointer.')
   }
 
   const folderCount = new Set(written.map((w) => path.dirname(w.path))).size

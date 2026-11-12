@@ -12,6 +12,7 @@ import {
   detectAgents,
   detectConflicts,
   detectDuplicateReads,
+  detectPluginDoors,
   installSkills,
   installedVersion,
   updateAll,
@@ -83,8 +84,8 @@ const fresh = detectAgents('project')
 check('A detected (fresh project)', fresh, [])
 const defaultTargets = resolveTargets('project')
 console.log('A default targets:', defaultTargets.map((t) => `${t.agents.map((a) => a.id).join('+')}@${t.path} exists=${t.exists}`).join(' | '))
-// Copilot, Kimi Code, and Amp share Antigravity's folder, so twelve resolve to nine.
-check('A twelve agents over nine folders', [AGENTS.length, defaultTargets.length], [12, 9])
+// Copilot, Kimi Code, Amp, and DeepSeek Harness share Antigravity's folder, so thirteen resolve to nine.
+check('A thirteen agents over nine folders', [AGENTS.length, defaultTargets.length], [13, 9])
 check('A copilot and kimi share the antigravity folder', resolveTargets('project', ['antigravity', 'copilot', 'kimi']).length, 1)
 
 // Claude Code only, via explicit selection (old behavior preserved).
@@ -189,7 +190,7 @@ check('D6 hermes writes a project pointer', updatePointers({ targets: hermesProj
 
 // Detection now sees the agents that were installed.
 const after = detectAgents('project')
-check('E detected after installs', [...after].sort(), ['amp', 'antigravity', 'claude', 'cline', 'copilot', 'cursor', 'gemini', 'hermes', 'kimi', 'opencode', 'pi'])
+check('E detected after installs', [...after].sort(), ['amp', 'antigravity', 'claude', 'cline', 'copilot', 'cursor', 'deepseek', 'gemini', 'hermes', 'kimi', 'opencode', 'pi'])
 
 // OpenCode reads .claude/skills and .agents/skills too, so a project that installs into
 // two of them holds the same names twice and OpenCode picks between them unpredictably.
@@ -356,8 +357,52 @@ try {
   fs.rmSync(mixed, { recursive: true, force: true })
 }
 
+// A door dropped from the list stops being named after an install, and nothing else notices.
+check(
+  'K all seven plugin doors are probed',
+  PLUGIN_DOORS.map((d) => d.id).sort(),
+  ['antigravity', 'claude', 'cline', 'codex', 'cursor', 'kimi', 'omp']
+)
+
 // A door row without a command would print a blank line where the answer belongs.
 check('K every plugin door names itself and its command', PLUGIN_DOORS.filter((d) => !d.id || !d.label || !d.update).map((d) => d.id), [])
+
+// A store holding an old copy beside the new one used to report whichever folder listed
+// first. The old copy is named to list first, so only a version sort reports 3.2.22.
+// The home is the throwaway one smoke-test.mjs launched this worker with. Writing here
+// outside that run would touch a real install, so refuse instead.
+const fakeHome = os.homedir()
+const inTmp = path.relative(fs.realpathSync(os.tmpdir()), fs.realpathSync(fakeHome))
+if (inTmp.startsWith('..') || path.isAbsolute(inTmp)) {
+  console.error(`refusing to write into ${fakeHome}: run this worker through smoke-test.mjs`)
+  process.exit(1)
+}
+try {
+  const copy = (dir, version) => {
+    fs.mkdirSync(path.join(fakeHome, dir, 'skills', CORE), { recursive: true })
+    fs.writeFileSync(path.join(fakeHome, dir, 'skills', CORE, 'VERSION'), version + '\n')
+  }
+  for (const [name, version] of [['aa-old', '3.2.9'], ['zz-new', '3.2.22']]) {
+    copy(path.join('.kimi-code', 'plugins', 'managed', name), version)
+    copy(path.join('.cline', 'plugins', '_installed', name, 'hash'), version)
+    copy(path.join('.omp', 'plugins', name), version)
+    fs.mkdirSync(path.join(fakeHome, '.codex', 'plugins', 'cache', 'anti-slop', CORE, version), { recursive: true })
+  }
+  check(
+    'L plugin doors report the newest copy in a store',
+    detectPluginDoors().map((d) => `${d.door.id} ${d.version}`).sort(),
+    ['cline 3.2.22', 'codex 3.2.22', 'kimi 3.2.22', 'omp 3.2.22']
+  )
+
+  // Run from home, --update must treat it as the global scope only.
+  installSkills({ skills: [CORE], targets: resolveTargets('global', ['claude']), overwrite: false })
+  process.chdir(fakeHome)
+  check('L update from home touches each folder once', updateAll().results.map((r) => r.location), ['global'])
+  check('L update from home writes no pointer', fs.existsSync(path.join(fakeHome, 'CLAUDE.md')), false)
+  check('L install from home writes no pointer', updatePointers({ targets: resolveTargets('project', ['claude']), skills: [CORE] }), [])
+} finally {
+  process.chdir(here)
+}
 
 if (failures.length > 0) {
   console.error(`\n${failures.length} check(s) failed: ${failures.join(', ')}`)

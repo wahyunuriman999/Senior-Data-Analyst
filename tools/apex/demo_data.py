@@ -74,7 +74,7 @@ def synth(p):
 
 DOMAINS = {
     "finance": dict(
-        title="Corporate Finance — Variance Decomposition", seed=101,
+        title="Corporate Finance: Variance Decomposition", seed=101,
         dim1_label="Region", dim1=["Jakarta", "Surabaya", "Bandung", "Medan", "Makassar"],
         w1=[.34, .20, .16, .15, .15],
         dim2_label="Divisi", dim2=["Ritel", "Korporat", "Treasury", "Syariah"],
@@ -97,7 +97,7 @@ DOMAINS = {
         slumps=[{"period": "2026-07", "d1": "Bandung", "d2": "Fashion", "mult": .55},
                 {"period": "2026-08", "d1": "Bandung", "d2": "Fashion", "mult": .55}]),
     "marketing": dict(
-        title="Marketing — Cohort & Funnel Analytics", seed=103,
+        title="Marketing: Cohort & Funnel Analytics", seed=103,
         dim1_label="Channel", dim1=["Organik", "Paid Ads", "Social", "Email", "Affiliate"],
         w1=[.28, .24, .22, .12, .14],
         dim2_label="Segmen", dim2=["Baru", "Kembali", "Reseller", "Korporat"],
@@ -136,7 +136,7 @@ DOMAINS = {
         base_units=2400, m_rev="Output Value", m_prof="Surplus", m_units="Karyawan",
         events=[{"period": "2026-01", "mult": 1.18, "disc": 0.0}]),
     "ecommerce": dict(
-        title="E-Commerce — Market Basket", seed=107,
+        title="E-Commerce: Market Basket", seed=107,
         dim1_label="Kota", dim1=["Jakarta", "Surabaya", "Bandung", "Medan", "Makassar"],
         w1=[.32, .21, .17, .16, .14],
         dim2_label="Kategori", dim2=["Elektronik", "Fashion", "Kecantikan", "Olahraga"],
@@ -146,7 +146,7 @@ DOMAINS = {
         events=[{"period": "2026-10", "d2": ["Fashion", "Kecantikan"], "mult": 1.45, "disc": .20},
                 {"period": "2025-12", "mult": 1.25, "disc": .12}]),
     "risk": dict(
-        title="Risk Management — Statistical Confidence", seed=108,
+        title="Risk Management: Statistical Confidence", seed=108,
         dim1_label="Portofolio", dim1=["Konsumer", "SME", "Korporat", "Mikro"],
         w1=[.40, .28, .20, .12],
         dim2_label="Kolektibilitas", dim2=["Lancar", "DPK", "Kurang Lancar", "Diragukan", "Macet"],
@@ -165,7 +165,7 @@ DOMAINS = {
         events=[{"period": "2026-07", "d2": ["IGD"], "mult": 1.35, "disc": 0.0},
                 {"period": "2026-08", "d2": ["IGD"], "mult": 1.28, "disc": 0.0}]),
     "operational": dict(
-        title="Operational Network — Anomaly Detection", seed=110,
+        title="Operational Network: Anomaly Detection", seed=110,
         dim1_label="Site", dim1=["Plant A", "Plant B", "Plant C", "Plant D", "Plant E"],
         w1=[.26, .24, .22, .16, .12],
         dim2_label="Shift", dim2=["Pagi", "Siang", "Malam"],

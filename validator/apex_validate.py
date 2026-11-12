@@ -22,6 +22,55 @@ DEPRECATED_NEON = ["#00f0ff", "#00ff66", "#ff0055", "#3B82F6",
                    "#10B981", "#EF4444", "#8B5CF6", "#F59E0B"]
 CAUSAL_WORDS = ["menyebabkan", "disebabkan oleh", "membuktikan",
                 "causes", "proven to drive", "proves that"]
+# Anti-slop stems (quality/anti-slop.md AS-01/AS-02): hype vocabulary from
+# miqdadbadjuber/anti-slop R-16 + its copywriting skill. Deliberately NOT
+# included: "robust" (robust statistics is the field's name, F-06),
+# "journey" (customer journey is a real funnel concept), "powerful" /
+# "intelligent" / "ultimate" (too broad — the review list governs them).
+ANTISLOP_PHRASES = ["unlock", "elevate", "empower", "delve", "showcase",
+                    "testament", "seamless", "cutting-edge", "cutting edge",
+                    "revolutionary", "next-gen", "next generation",
+                    "ai powered", "game-changer", "game changer",
+                    "effortless", "in today's", "let's dive",
+                    "read that again", "let that sink in",
+                    "i hope this helps", "honestly?"]
+
+
+def _readable_text(html):
+    """Text that can reach the reader, for V-ANTISLOP.
+
+    Strips HTML comments, <style> blocks, the vendored ECharts script
+    block, and the window.APEX_DATA raw-rows payload (vendor code and user
+    rows are not agent-written UI text), then strips JS comments from the
+    remaining script. What is left is static markup + app logic strings —
+    titles, KPI subtitles, fact labels — where slop would actually show.
+    """
+    text = re.sub(r'<!--.*?-->', '', html, flags=re.S)
+    text = re.sub(r'<style>.*?</style>', '', text, flags=re.S | re.I)
+    text = re.sub(r'<script>\s*/\* ECharts.*?</script>', '', text, flags=re.S)
+    text = re.sub(r'<script>\s*window\.APEX_DATA = .*?</script>', '',
+                  text, flags=re.S)
+    text = re.sub(r'/\*.*?\*/', '', text, flags=re.S)
+    text = re.sub(r'//[^\n]*', '', text)
+    return text
+
+
+def check_v_antislop(html):
+    """V-ANTISLOP (quality/anti-slop.md AS-01/AS-02): no em dash, no hype
+    vocabulary in readable dashboard text.
+
+    R-02 bans the em dash in agent-written text (en dash for ranges is
+    allowed; code comments are exempt and stripped above). R-16 + the
+    copywriting skill ban the hype stems. A PASS means "no
+    machine-detectable slop" — the full pattern list stays a review rule.
+    """
+    text = _readable_text(html)
+    low = text.lower()
+    hits = []
+    if "\u2014" in text:
+        hits.append("em dash (—)")
+    hits += [p for p in ANTISLOP_PHRASES if p in low]
+    return not hits, "no slop markers" if not hits else "slop: " + ",".join(hits)
 
 
 def check_v_dark(html):
@@ -204,6 +253,7 @@ CHECKS = [
     ("V-GROWTH-NA", "F-02", check_v_growth_na),
     ("V-FORECAST-T", "F-08", check_v_forecast_t),
     ("V-SIDEBAR", "design/sidebar.md", check_v_sidebar),
+    ("V-ANTISLOP", "quality/anti-slop.md", check_v_antislop),
 ]
 
 
