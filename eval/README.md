@@ -15,7 +15,7 @@ Static cases are not LLM-executed — they are covered elsewhere:
 
 | Case | Coverage |
 |---|---|
-| T4, T5, T6 | `validator/apex_validate.py` (16/16 on the v2 set) |
+| T4, T5, T6 | `validator/apex_validate.py` (17/17 on the v2 set) |
 | T8 | engine proof test — variance invariant `R0 + Σefek = R1` holds (residual ~0) |
 
 ## Run

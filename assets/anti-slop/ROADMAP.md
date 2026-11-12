@@ -11,13 +11,13 @@
 
 ## Where we are
 
-The latest release is **v3.2.20**. antislop is a packaged system: a lean, always-loaded core plus five additive skills, each a standard agent skill folder at `skills/<name>/SKILL.md`.
+The latest release is **v3.2.28**. antislop is a packaged system: a lean, always-loaded core plus five additive skills, each a standard agent skill folder at `skills/<name>/SKILL.md`.
 
-- **The core.** 38 rules in three tiers (Hard Gate, Purpose-Gate, Quality Locks), a Liveliness Toolkit, a mandatory Delivery Gate, and two usage modes (During / After). The single-file `antislop.md` is the same filter, pasteable into any chat window.
+- **The core.** 40 rules in three tiers (Hard Gate, Purpose-Gate, Quality Locks), a Liveliness Toolkit, a mandatory Delivery Gate, and two usage modes (During / After). The single-file `antislop.md` is the same filter, pasteable into any chat window.
 - **Usage-mode preferences.** Saving a global mode is opt-in. Without a settings file, every session still asks during or after. Saved modes announce their source, explicit session choices take precedence, and `--mode ask` restores the question.
 - **The skills.** `antislop` (the core), plus `antislop-ui`, `antislop-copywriting`, `antislop-human`, `antislop-layoutmobile`, and `antislop-code`. Each loads only when a task needs it.
-- **Distribution.** Eleven install paths from one repository: the interactive installer (`npx antislop-ai`), the skills.sh directory, native plugin doors for Claude Code, Antigravity, Codex, Cursor, Kimi Code, Cline, and Oh My Pi, the Pi package read from the root `package.json`, and the single file you paste into any chat. The README lists the commands; the guide walks each route from zero.
-- **Agent support.** Twelve agents, each read from its own documented skills folder, so no door depends on another vendor's convention holding.
+- **Distribution.** Twelve install paths from one repository: the interactive installer (`npx antislop-ai`), the skills.sh directory, native plugin doors for Claude Code, Antigravity, Codex, Cursor, Kimi Code, Cline, Oh My Pi, and DeepSeek Harness, the Pi package read from the root `package.json`, and the single file you paste into any chat. The README lists the commands; the guide walks each route from zero.
+- **Agent support.** Thirteen agents, each read from its own documented skills folder, so no door depends on another vendor's convention holding.
 
 ## Release history
 
@@ -61,6 +61,14 @@ Up to v3.0.0 each +0.1 shipped exactly one new skill, which kept the filter pull
 | v3.2.18 | Oh My Pi plugin door, also verified on a real install. The catalog is documented and the manifest was not, so `.omp-plugin/` ships only the catalog. |
 | v3.2.19 | The community files (CONTRIBUTING.md, CODE_OF_CONDUCT.md, the issue templates, and a pull request template), a README and a guide read end to end for the first time since v3.0.0, and a skill catalogue generated into the guide. |
 | v3.2.20 | Usage modes become a saved preference, opt-in and announced with its source, with a session choice still winning. From community PR #29. |
+| v3.2.21 | The contrast checker reads the threshold from the unrounded ratio, so a pairing between 4.495 and 4.5 no longer reports 4.50 and passes 4.5:1. From community PR #43. |
+| v3.2.22 | Maintenance round. The installer names all seven plugin doors, adding Kimi Code, Cline, and Oh My Pi, and CI runs on macOS alongside Linux and Windows. |
+| v3.2.23 | The plugin-door probes report the newest copy when a store holds more than one, Codex versions compare as numbers, and `--update` run from the home folder no longer writes a pointer there. |
+| v3.2.24 | Two Hard Gate rules: R-39 for semantics and interaction affordances, with page-level semantics only when the task produces a whole document, and R-40 for the performance mechanisms the code shows (sized media, an eager hero image, no render-blocking third-party script, no unmeasured numbers). The depth is native to `antislop-human` and `antislop-ui`, with WCAG 2.2, accessibility-pattern, and Core Web Vitals references adapted from the MIT-licensed web-quality-skills and read on demand. From community PR #46. |
+| v3.2.25 | Maintenance round. Node.js 20.12 is required with one line instead of a crash, no pointer is written in the home folder (community PR #48), the npm package ships the README and LICENSE (community PR #51), the smoke test gets its own home, and the core skill drops the single-file install wizard (issue #54). |
+| v3.2.26 | Three copywriting patterns: temporal runway clichés, theatrical takeaways, and title case in list elements. From community PR #57. |
+| v3.2.27 | Maintenance round. The contrast MCP rejects hex values that are not 3 or 6 digits, so `#00000080` no longer reports 21:1 and passes. From issue #59 and community PR #60. |
+| v3.2.28 | DeepSeek Harness becomes the eighth plugin door, shipped as a DSH bundle inside `antislop-ai` with an installer target for the shared `.agents/skills` folder. |
 
 ## What's next
 
@@ -74,14 +82,15 @@ Every door is verified against the vendor's current documentation before its ver
 
 | Version | Item | What it means |
 |---------|------|---------------|
-| v3.2.21 | Maintenance | A macOS probe, because none of the door probes above ran on it, so a report from that platform can be split into what the installer got wrong and what the agent's own configuration explains. No new agent: a `windows-latest` CI job, because CI runs on Linux alone while this repository is developed on Windows, plus a re-check of the plugin-door probes against real installs and probes for the three doors the installer still cannot see (Kimi Code, Cline, and Oh My Pi), so the notice that follows an install names all seven rather than four. |
+| v3.2.29 | Muse agent plugin | Muse becomes the ninth plugin door once its documentation is confirmed. |
+| v4.0.0 | /antislop-pixel | The new skills |
 
 Beyond the numbered plan, with no promised version:
 
 - **OpenAI public directory listing** (deferred). A versioned skill bundle, a submission document, and public privacy and terms pages. Parked until identity verification on the OpenAI Platform can proceed.
 - **Gemini CLI** (deferred). Consumer access ended on 18 June 2026 and Antigravity CLI replaced it, which already has a door. Enterprise Code Assist licenses and paid API keys still work, so `.gemini/skills/` stays. Parked with antislop-compact.
 - **Kiro** (candidate). Reads `.kiro/skills/` per project and `~/.kiro/skills/` globally, activating skills by description. Outside the shared `.agents` standard, so it would be an installer row and an `AGENTS.md` pointer rather than a marketplace door.
-- **Roo** (candidate). Sources disagree on its skill folder: some say `.roo/skills/`, others `.roo/rules/`. The path has to be settled against Roo's own documentation before this can be a version.
+- **Roo** (not planned). The project was archived on 15 May 2026, so there is no vendor left to verify a door against. Its last release already reads `.agents/skills/` per project and `~/.agents/skills/` globally, which the installer fills for other agents.
 - **More plugin doors** as other agents grow plugin systems antislop can ride from the same repository.
 - **antislop-compact** (deferred). A standalone cheat-sheet version of each skill would have to track every change to the full ones, and it is only sound if it keeps the one-line why per rule and the Delivery Gate.
 - **Skill candidates** still open: `antislop-docs` and `antislop-identity`.

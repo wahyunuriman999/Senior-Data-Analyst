@@ -231,7 +231,7 @@ def build(rows, cohorts, cfg, echarts_js, app_js):
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>APEX v2 — {title}</title>
+<title>APEX v2: {title}</title>
 <style>{CSS}</style>
 </head>
 <body>

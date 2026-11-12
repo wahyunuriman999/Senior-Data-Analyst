@@ -2,59 +2,76 @@
   <img src="./assets/antislop-banner.png" alt="antislop" width="100%" />
 </p>
 
-<p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2ea44f" alt="License: MIT"></a>
-  <a href="https://github.com/miqdadbadjuber/anti-slop/releases"><img src="https://img.shields.io/github/v/release/miqdadbadjuber/anti-slop?label=version&color=1f6feb" alt="Version"></a>
-</p>
+<div align="center">
 
-<p align="center">
-  <a href="https://skills.sh/miqdadbadjuber/anti-slop"><img src="https://skills.sh/b/miqdadbadjuber/anti-slop" alt="skills.sh"></a>
-</p>
+<a href="https://trendshift.io/repositories/137042?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-137042" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/137042/daily?language=JavaScript" alt="Trendshift Daily Trending" width="250" height="55"/></a>
+<a href="https://trendshift.io/repositories/137042?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-137042" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/137042/monthly?language=JavaScript" alt="Trendshift Monthly Trending" width="250" height="55"/></a>
 
-<h1 align="center">Anti Slop: Rules for AI Coding Agents</h1>
+[![npm version](https://img.shields.io/npm/v/antislop-ai?style=flat-square&color=cb3837&label=npm)](https://www.npmjs.com/package/antislop-ai)
+[![Node.js](https://img.shields.io/badge/Node.js-20.12%2B-339933?style=flat-square&logo=nodedotjs&logoColor=white)](cli/package.json)
+[![skills.sh](https://skills.sh/b/miqdadbadjuber/anti-slop?style=flat-square)](https://skills.sh/miqdadbadjuber/anti-slop)
+[![MIT license](https://img.shields.io/badge/license-MIT-f4c430?style=flat-square)](LICENSE)
+[![Discord](https://img.shields.io/badge/Discord-join-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/VWKggJfHFR)
 
-<p align="center">
-  A rulebook that stops an AI coding agent shipping generic UI, filler copy, and AI-shaped code.<br>
-  A <strong>filter, not a style guide</strong>: no prescribed colors, fonts, or layouts, and direction stays yours.
-</p>
+# Anti Slop: Rules for AI Coding Agents
 
-<p align="center">
-  <strong>New here?</strong> <a href="GUIDE.md">GUIDE.md</a> is the from-zero walkthrough.
-</p>
+### A rulebook that stops an AI coding agent shipping generic UI, text, and AI-shaped code.
 
-## See the difference
+**A filter, not a style guide.** No prescribed colors, fonts, or layouts, and direction stays yours.
 
-The same brief, built four ways. antislop filters and `DESIGN.md` supplies direction. They are different jobs, and these are the four results.
+**[Website](https://antislop.ai.id) · [Guide](GUIDE.md) · [Install](https://antislop.ai.id/install)**
+
+[Before and after](#before-and-after) · [Install](#install) · [What it does](#what-it-does) · [Skills](#skills) · [FAQ](#faq)
+
+<code>npx antislop-ai</code>
+
+</div>
+
+---
+
+## Before and after
+
+Each pair below is one brief, run twice, so the difference is visible side by side.
 
 ### UI
 
-| **Nothing at all** | **antislop alone** | **`DESIGN.md` alone** |
-|:--|:--|:--|
-| <a href="assets/compare/ui/without.webp"><img src="assets/compare/ui/without.webp" alt="A generic landing page: a sparkle logo, a NEXT-GEN AI 2.0 beta pill above the headline, and a fake terminal reporting 0.0001ms latency" width="100%"></a> | <a href="assets/compare/ui/w-antislop.webp"><img src="assets/compare/ui/w-antislop.webp" alt="The same page with antislop: honest copy on a restrained dark layout with a single accent color" width="100%"></a> | <a href="assets/compare/ui/w-design.webp"><img src="assets/compare/ui/w-design.webp" alt="The same page with `DESIGN.md` only: a photographic hero, with the stat cards still reading 10,000% ROI Synergy Multiplier and a 5.0 rating from 500,000 founders" width="100%"></a> |
-| Where most AI output starts: a sparkle logo, a beta pill, and a fake terminal. | Honest, because the filter removed the invented numbers. Plain, because beauty is not its job. | The direction lands, but the slop stays, because `DESIGN.md` directs and does not filter. |
+With /antislop-ui. antislop alone is not the after. It removes the slop and stops there; direction comes from `DESIGN.md`. For UI work you intend to ship, that file is mandatory: without it the result is labelled a draft without direction. The pair below is the result.
 
-The fourth is the only one of the four that is clean and directed at the same time:
-
-| **antislop + `DESIGN.md`** |
-|:--|
-| <a href="assets/compare/ui/w-all.webp"><img src="assets/compare/ui/w-all.webp" alt="The same page with antislop and `DESIGN.md`: a full-bleed illustrated hero with one honest headline and project-specific navigation" width="100%"></a> |
-| Honest numbers and a real direction in the same build. The filter removes what should not be there; `DESIGN.md` fills the space that leaves, which is the one thing neither manages alone. |
-
-### Copy
-
-One prompt, run twice.
-
-| Before | After |
+| **Before: without antislop** | **After: antislop + `DESIGN.md`** |
 |:--|:--|
-| <a href="assets/compare/text/before.webp"><img src="assets/compare/text/before.webp" alt="An AI written Discord launch post: emoji bullet points, NEW DROP in capitals, and hype in every line" width="100%"></a> | <a href="assets/compare/text/after.webp"><img src="assets/compare/text/after.webp" alt="The same launch post written with antislop-copywriting: plain sentences, no emoji bullets, and a note to cut any line with nothing real to say" width="100%"></a> |
+| <a href="assets/compare/ui/without.webp"><img src="assets/compare/ui/without.webp" alt="The before: a generic landing page with a sparkle logo, a NEXT-GEN AI 2.0 beta pill above the headline, and a fake terminal reporting 0.0001ms latency" width="100%"></a> | <a href="assets/compare/ui/w-all.webp"><img src="assets/compare/ui/w-all.webp" alt="The after: the same page with antislop and DESIGN.md, a full-bleed illustrated hero with one honest headline and project-specific navigation" width="100%"></a> |
+| This is what most AI output looks like: slop everywhere once you take a closer look. | Much better. antislop kills the slop, and `DESIGN.md` gives it a real visual direction. |
+
+The two partial states are worth seeing, because each one shows why the other half matters:
+
+| **Partial: antislop alone** | **Partial: `DESIGN.md` alone** |
+|:--|:--|
+| <a href="assets/compare/ui/w-antislop.webp"><img src="assets/compare/ui/w-antislop.webp" alt="Partial result: antislop with no design direction, a plain dark layout with the invented numbers removed" width="100%"></a> | <a href="assets/compare/ui/w-design.webp"><img src="assets/compare/ui/w-design.webp" alt="Partial result: DESIGN.md with no filter, a photographic hero with stat cards still reading 10,000% ROI Synergy Multiplier" width="100%"></a> |
+| The slop is gone, but so is the direction. That is why antislop needs a `DESIGN.md`. | The direction is there, but honestly it is still far from good: the slop still shows. |
+
+### Copywriting
+
+With /antislop-copywriting. One prompt, run twice.
+
+<a href="assets/compare/copywriting/before-after.png"><img src="assets/compare/copywriting/before-after.png" alt="Side by side: before, an AI written Discord launch post with NEW DROP in capitals, emoji bullets, and hype in every line; after, the same post in plain sentences, with a note to cut any line that has nothing real to say" width="100%"></a>
+
+### Accessibility
+
+With /antislop-human. One sign-in form, run twice.
+
+<a href="assets/compare/human/before-after.png"><img src="assets/compare/human/before-after.png" alt="Side by side: before, a sign-in form with pale grey labels, a radio button, and blue body links; after, the same form with darker labels, a checkbox, underlined links, and a solid black button" width="100%"></a>
+
+### Mobile layout
+
+With /antislop-layoutmobile. One dashboard on a phone, run twice.
+
+<a href="assets/compare/layoutmobile/before-after.png"><img src="assets/compare/layoutmobile/before-after.png" alt="Side by side: before, a desktop finance dashboard squeezed onto a phone with a clipped headline and a wide table; after, the same screen with a donut chart, stacked allocation bars, and one readable column" width="100%"></a>
 
 ### Code
 
-One file, run twice.
+With /antislop-code. One file, run twice.
 
-| Before | After |
-|:--|:--|
-| <a href="assets/compare/code/before.webp"><img src="assets/compare/code/before.webp" alt="Python with box-drawing section banners, emoji, and a comment on every constant that restates the constant" width="100%"></a> | <a href="assets/compare/code/after.webp"><img src="assets/compare/code/after.webp" alt="The same Python with the banners and emoji gone, one comment left that says what the module does, and the code itself untouched" width="100%"></a> |
+<a href="assets/compare/code/before-after.png"><img src="assets/compare/code/before-after.png" alt="Side by side: before, Python with box-drawing section banners, emoji, and a comment restating every constant; after, the same code with the banners and emoji gone and one comment left where it says something" width="100%"></a>
 
 Every image here opens full size if you click it.
 
@@ -112,6 +129,20 @@ Then open **Customize**, find **antislop**, and select **Install**.
 /plugins install https://github.com/miqdadbadjuber/anti-slop
 ```
 
+### DeepSeek Harness - Plugin
+
+Open **Plugins**, choose **Add plugin**, paste this package name, and select **Install**:
+
+```text
+antislop-ai
+```
+
+That is the desktop route. From a terminal instead, name the profile you use:
+
+```bash
+dsh plugin --profile desktop add antislop-ai
+```
+
 ### Cline - Plugin
 
 ```bash
@@ -143,7 +174,7 @@ curl -o antislop.md https://raw.githubusercontent.com/miqdadbadjuber/anti-slop/m
 
 ## What it does
 
-- **38 mandatory rules** (R-01 to R-38) in three tiers: Hard Gate, Purpose-Gate, and Quality Locks.
+- **40 mandatory rules** (R-01 to R-40) in three tiers: Hard Gate, Purpose-Gate, and Quality Locks.
 - **A Liveliness Toolkit**: three dials (ENERGY / RHYTHM / MOTION) and a Design Read, so the result comes out alive rather than merely clean.
 - **A Delivery Gate**: a mandatory PASS/FAIL report in four blocks, run before anything ships.
 - **Six skills**, one per concern, so an agent loads only what a task needs.
@@ -155,9 +186,9 @@ The core prevents slop but cannot invent direction. `DESIGN.md` (yours) supplies
 | Skill | Covers | Pick it for |
 |-------|--------|-------------|
 | antislop | The core filter: rules, tiers, the Delivery Gate, liveliness | Everything. Always loaded |
-| antislop-ui | Layout, color, components, decoration, motion, structure | UI and visual work |
+| antislop-ui | Layout, color, components, decoration, motion, structure, performance | UI and visual work |
 | antislop-copywriting | Headlines, CTAs, tone, fake stats, anti-AI writing, markdown hygiene | Copy and text |
-| antislop-human | Contrast, keyboard, focus, states | Accessibility |
+| antislop-human | Contrast, keyboard, focus, states, interaction affordances | Accessibility |
 | antislop-layoutmobile | Reflow across screen widths, breakpoints, grids, overflow, tap targets | Responsive work |
 | antislop-code | AI-slop comments: which to remove, which to keep | Comment cleanup |
 
@@ -196,18 +227,18 @@ A plugin keeps its own copy under the agent that installed it, so it updates thr
 No, a filter. It rejects technique without purpose and requires liveliness. Direction is yours.
 
 **Which agents does it work with?**
-Claude Code, Codex, Antigravity, OpenCode, Cursor, Cline, Amp, Gemini CLI, Hermes, GitHub Copilot, Kimi Code, Pi, and Oh My Pi. The installer covers twelve of them and detects which ones you have, and the plugin doors install from this same repository. [GUIDE.md](GUIDE.md) lists the folder each agent reads.
+Claude Code, Codex, Antigravity, OpenCode, Cursor, Cline, Amp, Gemini CLI, Hermes, GitHub Copilot, Kimi Code, DeepSeek Harness, Pi, and Oh My Pi. The installer covers thirteen of them and detects which ones you have, and the plugin doors install from this same repository. [GUIDE.md](GUIDE.md) lists the folder each agent reads.
 
 **What is a skill?**
 A folder that goes deeper into one concern, holding a `SKILL.md` with its rules. Skills reference the core rules by number and never duplicate them, so adding one does not change the core.
 
 ## Roadmap
 
-**v3.2.20** adds opt-in usage-mode preferences and announces the active mode and its source. It builds on the v3.2.19 changes:
+**v3.2.28** adds DeepSeek Harness as the eighth plugin door:
 
-- **The community files.** CONTRIBUTING.md, CODE_OF_CONDUCT.md, issue templates, and a pull request template, so the repository reads as one you can join and not only one you can install.
-- **A README rebuilt.** One heading per install route, and the detail that used to be repeated here moved to the guide, where it is written out in more depth.
-- **A guide rebuilt.** One section per route, so install, update, and removal sit together instead of being written out three times, and a catalogue of every named pattern generated from the skills themselves and checked in CI.
+- **One package, two jobs.** `antislop-ai` now also declares a DSH bundle, so Plugins, Add plugin, and `antislop-ai` loads all six skills without copying files.
+- **Bundled rank.** The skills load at the bundled rank, so a folder install of the same skill still wins when both exist.
+- **Installer target.** DeepSeek Harness joins the agent list and reads the shared `.agents/skills` folder.
 
 Every earlier release, and what comes next, is in [ROADMAP.md](ROADMAP.md).
 
@@ -221,7 +252,7 @@ Thanks to everyone who helps make antislop better.
 
 <p align="center">
   <a href="https://github.com/miqdadbadjuber/anti-slop/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=miqdadbadjuber/anti-slop&v=3.2.20" alt="antislop contributors" />
+    <img src="https://contrib.rocks/image?repo=miqdadbadjuber/anti-slop&v=3.2.28" alt="antislop contributors" />
   </a>
 </p>
 
@@ -234,6 +265,12 @@ It clears the slop from your UI, text, and code.<br>
 A beautiful UI is <code>DESIGN.md</code>'s job, and yours.”</em></p>
 
 <hr>
+
+## Disclaimer
+
+Get antislop from [miqdadbadjuber/anti-slop](https://github.com/miqdadbadjuber/anti-slop), [antislop.ai.id](https://antislop.ai.id), or the [antislop-ai npm package](https://www.npmjs.com/package/antislop-ai). The npm name `antislop` belongs to a different package, so `npx antislop` does not install this project.
+
+There is no antislop coin, token, or fundraising. Any crypto coin, token, NFT, or fundraising that uses the antislop name was not created by this project and is a scam. antislop accepts donations only through the Sponsor button on this repository and [Saweria](https://saweria.co/antislop); anyone collecting money in its name anywhere else is not authorized.
 
 ## License
 
