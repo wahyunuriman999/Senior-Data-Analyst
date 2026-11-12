@@ -1,12 +1,15 @@
 # Adversarial eval
 
 `run_adversarial.py` executes the behavioral cases from
-`proof/test-suites.md` (T1, T2, T3, T7) and `proof/adversarial-cases.md`
-(C1–C15) against an LLM served over an OpenAI-compatible API.
+`proof/test-suites.md` (T1, T2, T3, T7), `proof/adversarial-cases.md`
+(C1–C15), and the v3 formula-library cases (F01, F02, F03, F04, F05, F06,
+F08, F12) from `analytical/formula-library.md` — 27 cases total.
 
 Each case uses a **structured-response prompt** (`CHART: …`, `DECISION: …`,
 …) so the pass/fail assertions stay deterministic instead of relying on a
-second LLM judge.
+second LLM judge. Responses are normalized (markdown emphasis +
+zero-width chars stripped) before the assertions run, so a correct
+structured answer never fails on formatting.
 
 Static cases are not LLM-executed — they are covered elsewhere:
 

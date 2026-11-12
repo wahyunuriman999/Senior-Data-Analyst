@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 """Adversarial eval harness for the Apex Data Analyst skill.
 
-Runs the behavioral cases (T1,T2,T3,T7 + C1..C15) against an LLM via an
-OpenAI-compatible endpoint, using structured-response prompts so the
+Runs the behavioral cases (T1,T2,T3,T7 + C1..C15 + F01..F12) against an LLM
+via an OpenAI-compatible endpoint, using structured-response prompts so the
 assertions stay deterministic. Static cases (T4,T5,T6,T8) are covered by
 validator/apex_validate.py and the engine proof tests — see RESULTS notes.
+
+F-series cases test the v3 formula library (F-00..F-14); each carries its
+own system prompt (F_SYSTEM) on top of SKILL_CONTEXT. Responses are
+normalized (markdown emphasis + zero-width chars stripped) before the
+checks run, so a correct structured answer never fails on formatting.
 
 Env:
   APEX_EVAL_BASE_URL  e.g. http://127.0.0.1:20128/v1
@@ -106,19 +111,70 @@ CASES = [
                   lambda t: (lambda m: bool(m) and int(m.group(1)) <= 5)(re.search(r"KPI_COUNT:\s*(\d+)", t)))]),
 ]
 
+# ---- F-series (formula library F-00..F-14, added 2026-11-12) ----
+F_SYSTEM = (
+    SKILL_CONTEXT
+    + "\nFormula rules (F-00..F-14): one number one formula; a mean is never "
+    "reported alone (show median + P90); growth from a zero base is n/a, "
+    "never 0% or infinite; ratios are recomputed from the grain, never "
+    "averaged across groups; COUNT DISTINCT is never summed across groups; "
+    "price/volume/mix decompositions must reconcile with residual 0; "
+    "anomalies use median/MAD, not z-scores; forecasts use a t-interval "
+    "with a mandatory backtest; in-progress records are excluded from "
+    "duration averages."
+)
+
+F_CASES = [
+    dict(id="F01", system=F_SYSTEM,
+         prompt="Monthly revenues: [10, 12, 11, 13, 200]. The mean is 49.2. Reply in exactly this format:\nMEDIAN: <number>",
+         checks=[("median is 12, not the mean", lambda t: bool(re.search(r"MEDIAN:\s*12\b", t)))]),
+    dict(id="F02", system=F_SYSTEM,
+         prompt="Revenue was 0 last month and 100 this month. Reply in exactly this format:\nGROWTH: <number% or n/a>",
+         checks=[("zero-base growth is n/a", lambda t: bool(re.search(r"GROWTH:\s*n/a", t, re.I)))]),
+    dict(id="F03", system=F_SYSTEM,
+         prompt="Store A: 10 units, Rp100 revenue. Store B: 1 unit, Rp1000 revenue. Reply in exactly this format:\nAOV: <number>\nMETHOD: <one line>",
+         checks=[("AOV recomputed from grain (=100)", lambda t: bool(re.search(r"AOV:\s*(?:Rp\s*)?100\b", t))),
+                 ("not the avg-of-avg trap (505)", lambda t: not re.search(r"AOV:\s*(?:Rp\s*)?505\b", t))]),
+    dict(id="F04", system=F_SYSTEM,
+         prompt="Region X has 100 unique stores. Region Y has 80 unique stores. 30 stores are in both regions. Reply in exactly this format:\nTOTAL_UNIQUE: <number>",
+         checks=[("distinct counts not summed (=150)", lambda t: bool(re.search(r"TOTAL_UNIQUE:\s*150\b", t)))]),
+    dict(id="F05", system=F_SYSTEM,
+         prompt="Total revenue change is +5. Price effect -5, volume effect +8, mix effect +2. Reply in exactly this format:\nRESIDUAL: <number>",
+         checks=[("decomposition reconciles, residual 0", lambda t: bool(re.search(r"RESIDUAL:\s*0\b", t)))]),
+    dict(id="F06", system=F_SYSTEM,
+         prompt="Values: [100, 101, 99, 100, 102, 98, 100, 101, 99, 100, 100, 300]. Reply in exactly this format:\nMETHOD: <mad|z-score>\nOUTLIER: <number>",
+         checks=[("uses median/MAD, not z-score", lambda t: bool(re.search(r"METHOD:\s*mad", t, re.I))),
+                 ("flags 300", lambda t: bool(re.search(r"OUTLIER:\s*300\b", t)))]),
+    dict(id="F08", system=F_SYSTEM,
+         prompt="You have 12 months of data and forecast 3 months ahead. A 95% interval with a normal z=1.96 ignores estimation error. Reply in exactly this format:\nINTERVAL: <t-interval|z-interval>\nBACKTEST: <yes|no>",
+         checks=[("uses t-interval", lambda t: bool(re.search(r"INTERVAL:.*t-interval", t, re.I))),
+                 ("ships a backtest", lambda t: bool(re.search(r"BACKTEST:\s*yes", t, re.I)))]),
+    dict(id="F12", system=F_SYSTEM,
+         prompt="Today: 23 visits are still in progress (no end time yet). Completed visits average 88.8 minutes. Reply in exactly this format:\nINCLUDE_IN_PROGRESS_IN_AVG: <yes|no>",
+         checks=[("excludes in-progress records", lambda t: bool(re.search(r"INCLUDE_IN_PROGRESS_IN_AVG:\s*no", t, re.I)))]),
+]
+
 STATIC_NOTES = {
-    "T4": "static — validator checks V-FACTS + V-NO-AI-PERSONA on generated HTML (12/12 on v2 set)",
-    "T5": "static — validator check V-CLICK counts wired handlers (12/12 on v2 set)",
-    "T6": "static — validator checks V-NOCDN/V-NODCL/V-HEIGHTS (12/12 on v2 set)",
+    "T4": "static — validator checks V-FACTS + V-NO-AI-PERSONA on generated HTML (16/16 on v2 set)",
+    "T5": "static — validator check V-CLICK counts wired handlers (16/16 on v2 set)",
+    "T6": "static — validator checks V-NOCDN/V-NODCL/V-HEIGHTS (16/16 on v2 set)",
     "T8": "covered by engine proof — variance invariant R0+Σefek=R1 holds (residual ~0, node-tested)",
 }
 
 
-def chat(prompt):
+def norm(t):
+    # Strip markdown emphasis + zero-width chars before checking, so a
+    # correct structured answer never fails on formatting (2026-11-12:
+    # "**JOIN_DECISION:** halt" and "**DISCLAIMER:** yes" failed the
+    # literal regexes even though the substance was right).
+    return re.sub("[*" + chr(0x200B) + "]+", "", t)
+
+
+def chat(prompt, system=None):
     body = json.dumps({
         "model": MODEL,
         "messages": [
-            {"role": "system", "content": SKILL_CONTEXT},
+            {"role": "system", "content": system or SKILL_CONTEXT},
             {"role": "user", "content": prompt},
         ],
         "temperature": 0,
@@ -159,12 +215,12 @@ def main():
         return 2
 
     results = []
-    for case in CASES:
+    for case in CASES + F_CASES:
         if only and case["id"] not in only:
             continue
         print(f"... {case['id']}", flush=True)
-        resp = chat(case["prompt"])
-        fails = [name for name, fn in case["checks"] if not safe(fn, resp)]
+        resp = chat(case["prompt"], case.get("system"))
+        fails = [name for name, fn in case["checks"] if not safe(fn, norm(resp))]
         results.append({"id": case["id"], "pass": not fails,
                         "failed_checks": fails, "response": resp.strip()[:600]})
 
