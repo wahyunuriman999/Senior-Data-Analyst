@@ -121,6 +121,72 @@ def check_v_ssot(html):
     return ok, f"filter() usage={has_filter}, SSOT marker={has_ssot_marker}"
 
 
+def check_v_formula(html):
+    """V-FORMULA (F-00/F-01/F-03/F-08): facts show median, P90, AOV, backtest.
+
+    v3: a mean is never reported alone, AOV is recomputed from grain, and
+    every forecast ships with its backtest. All four markers must be in
+    the generated dashboard's fact logic.
+    """
+    low = html.lower()
+    markers = {"median": "median" in low, "P90": "p90" in low,
+               "AOV": "aov" in low, "backtest": "backtest" in low}
+    missing = [k for k, v in markers.items() if not v]
+    return not missing, "fact markers ok" if not missing else "missing: " + ",".join(missing)
+
+
+def check_v_growth_na(html):
+    """V-GROWTH-NA (F-02): zero-base growth is n/a, never 0%.
+
+    The engine must contain the null-returning div0 and the "basis 0"
+    display string; a `... : 0` fallback on the growth path is the bug.
+    """
+    has_null_div0 = bool(re.search(r"\(a - b\) / b : null", html))
+    has_na_label = "basis 0" in html
+    ok = has_null_div0 and has_na_label
+    return ok, f"null div0={has_null_div0}, n/a label={has_na_label}"
+
+
+def check_v_forecast_t(html):
+    """V-FORECAST-T (F-08): t-based prediction interval, dynamic labels.
+
+    Fails on the v2 bug pattern `f ± 1.96*sigma` and on hardcoded future
+    month labels; requires the t-critical helper + derived labels.
+    """
+    low = html.lower()
+    has_z_bug = bool(re.search(r"1\.96\s*\*\s*sigma", low))
+    has_hardcoded = '["Nov 26", "Des 26", "Jan 27"]' in html
+    has_t = "tcrit95" in low
+    has_dyn = "nextmonthlabels" in low
+    ok = (not has_z_bug) and (not has_hardcoded) and has_t and has_dyn
+    detail = f"z-bug={has_z_bug}, hardcoded-labels={has_hardcoded}, tCrit95={has_t}, dynamic-labels={has_dyn}"
+    return ok, detail
+
+
+def check_v_sidebar(html):
+    """V-SIDEBAR (design/sidebar.md): grouped nav, active state, collapse,
+    mobile drawer — and the nav must never be hidden with display:none.
+
+    The v2 sidebar it replaces had 6 flat emoji links, no groups, no
+    collapse control, and vanished entirely below 1100px.
+    """
+    has_aside = bool(re.search(r'<aside[^>]+class="sidebar"', html))
+    groups = len(re.findall(r'class="nav-group-label"', html))
+    has_active = bool(re.search(r'class="nav-item on"', html))
+    has_collapse = 'id="btn-sidebar-collapse"' in html
+    has_burger = 'id="btn-sidebar-menu"' in html
+    has_drawer = "drawer-open" in html and 'id="sidebar-backdrop"' in html
+    no_hide = not bool(re.search(r'\.sidebar\s*\{[^}]*display\s*:\s*none', html))
+    badges = len(re.findall(r'class="nav-badge"', html))
+    ok = (has_aside and groups >= 2 and has_active and has_collapse
+          and has_burger and has_drawer and no_hide and badges >= 1)
+    detail = (f"aside={has_aside}, groups={groups}, active={has_active}, "
+              f"collapse={has_collapse}, burger={has_burger}, "
+              f"drawer={has_drawer}, no-display-none={no_hide}, "
+              f"badges={badges}")
+    return ok, detail
+
+
 CHECKS = [
     ("V-DARK", "Q-VIS-000", check_v_dark),
     ("V-PALETTE", "Q-VIS-007", check_v_palette),
@@ -134,6 +200,10 @@ CHECKS = [
     ("V-SLICER", "Q-VIS-HEADER-SLICER", check_v_slicer),
     ("V-MONO", "tokens.json", check_v_mono),
     ("V-SSOT", "Q-VIS-ANALYTICAL", check_v_ssot),
+    ("V-FORMULA", "F-00/F-01/F-03/F-08", check_v_formula),
+    ("V-GROWTH-NA", "F-02", check_v_growth_na),
+    ("V-FORECAST-T", "F-08", check_v_forecast_t),
+    ("V-SIDEBAR", "design/sidebar.md", check_v_sidebar),
 ]
 
 

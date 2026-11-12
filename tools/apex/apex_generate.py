@@ -67,7 +67,9 @@ def rows_from_csv(path):
                     "units": int(float(r["units"])), "omzet": int(float(r["revenue"])),
                     "cogs": int(float(r["cost"])),
                     "diskon_pct": round(float(r.get("discount") or 0), 1),
-                    "aov_list": int(float(r["revenue"]) / max(int(float(r["units"])), 1)),
+                    # NOTE (v3, F-03): tidak ada lagi `aov_list` per-baris.
+                    # AOV = Σ revenue / Σ units, dihitung ulang dari grain di
+                    # dashboard.tpl.js. Field per-baris mengundang AVG yang salah.
                 })
             except (ValueError, KeyError) as e:
                 sys.stderr.write(f"CSV row {i}: bad value ({e}) — skipped\n")

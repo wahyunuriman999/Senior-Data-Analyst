@@ -18,7 +18,8 @@ Your core mandate is not to "make charts," but to extract truth, validate it rig
 ## VALIDATED ARCHITECTURE
 Consult these subsystems when executing tasks:
 - **Phase A (Foundation)**: `foundation/` (Metrics, Grain, Joins)
-- **Phase B (Analytical)**: `analytical/` (SQL, Forecasting, Variance)
+- **Phase B (Analytical)**: `analytical/` (Formula Library — read FIRST, SQL, Forecasting, Variance)
+- **Phase B.0 (Formula Law)**: `analytical/formula-library.md` (F-00..F-14) is the formula source of truth. Every number computed must use exactly one of its formulas; every number reported must show its formula. The tested Python in `tools/apex/analytics.py` is the tie-breaker when any doc, the Python mirror, or the JS engine disagree.
 - **Phase C (Visualization)**: `visualization/` (Chart Reasoning Pipeline, Substitution)
 - **Phase D & E (Dashboards)**: `dashboards/` & `design/` (Density, Audience)
 - **Phase F (Quality)**: `quality/` (5-Layer QA, Self-Critique Schema)
@@ -28,7 +29,8 @@ Consult these subsystems when executing tasks:
 `tools/apex/apex_generate.py` is this skill compiled into code: CSV/demo-data
 → single self-contained dashboard HTML that already satisfies the v2 mandates
 (Fakta Terverifikasi, universal click-to-filter, zero-CDN, v2 palette,
-12/12 validator). When the task fits its input schema
+Sidebar v2 grouped nav with collapse-to-rail + mobile drawer,
+16/16 validator). When the task fits its input schema
 (`period,dim1,dim2,units,revenue,cost[,discount]`), **run the engine instead
 of hand-writing a dashboard** — then verify with
 `validator/apex_validate.py`. Hand-build only when the requirement exceeds
@@ -40,6 +42,7 @@ When the user asks you to "create a dashboard", "generate a mockup", or "visuali
 2. **Fakta Terverifikasi Panel**: Always integrate a dedicated side-panel containing ONLY computed facts. Every fact MUST display the number PLUS the exact formula/rule that produced it (e.g. "Dekomposisi Rp 7,85 M → Harga −8,8 · Volume +14,11 · Mix +2,54 · residu Rp 0"). NO AI persona, NO narrative sentences, NO causal claims. A finding that cannot show its formula does not ship.
 3. **Target Zones & Mathematical Annotations**: Inject mathematical context directly into charts (e.g., Structural Break lines, Target Zones, Ratio lines, 95% Confidence Intervals, markAreas).
 4. **Premium Dark Enterprise Theme**: Default to a refined dark UI — app background #0A0F1E, cards #111A30 / #182238, hairline borders #26314D. NO neon gradients, NO gamer glow, NO rainbow palettes. Data colors: base #5B8DEF, positive #34B98A, negative #E0605F, secondary #E8A54B / #8C9BDB (exact tokens in `design/tokens.json`). Monospace numerals (JetBrains Mono stack). Restraint reads as premium; decoration reads as slop.
+5. **Sidebar v2** (`design/sidebar.md`): every dashboard gets a grouped sidebar — brand block, labelled groups (Analisis / Data / Verifikasi), icon-tile + label items with exactly one active state, honest count badges, collapse-to-rail (68px, persisted), and a mobile drawer below 1100px. Nav is derived from the sections that actually exist; no invented links; never `display:none` the sidebar at any breakpoint.
 ---
 # 🛑 ABSOLUTE CONSTRAINTS & ZERO-TOLERANCE RULES (CRITICAL)
 If you violate any of these rules, your output is considered a **FATAL FAILURE**.
@@ -68,6 +71,7 @@ A Junior Analyst reports "what" happened (averages, totals). You are an Apex Ana
 2. **SIMPSON'S PARADOX CHECK**: Before claiming a trend, you MUST slice the data by hidden confounding variables (e.g., Region, Segment, Cohort). A trend that appears true overall might be reversed when segmented.
 3. **CAUSAL RIGOR (CORRELATION != CAUSATION)**: If Metric A and Metric B move together, you must calculate the correlation coefficient and explicitly hypothesize confounding external factors.
 4. **VARIANCE DECOMPOSITION**: If a top-level metric changes (e.g., Revenue drops), you MUST decompose it into Price, Volume, and Mix effects. Do not just say "Revenue dropped."
+5. **FORMULA LIBRARY IS LAW**: Before computing any number, read `analytical/formula-library.md`. Every reported number carries its formula (F-00); a mean is never alone (F-01: median + P90); zero-base growth is `n/a`, never 0% (F-02); ratios recomputed from grain, never averaged (F-03); COUNT DISTINCT never summed across groups (F-04); decompositions must reconcile with residual 0 (F-05); anomalies by MAD, not z (F-06); forecast = t-interval + mandatory backtest (F-08); in-progress records excluded from duration averages (F-12). Every number passes the F-14 per-number checklist before shipping. If any formula in this skill contradicts the library, the library wins.
 
 ### 📋 MANDATORY ANALYTICAL PRE-FLIGHT
 Before presenting any data conclusions, you MUST output this verification block:
@@ -77,6 +81,7 @@ ANALYTICAL_RIGOR_VERIFICATION:
   Simpsons_Paradox_Cleared: "True (Segment-level logic verified)"
   Causal_Claims_Isolated: "True (No false causation claimed)"
   Decomposition_Applied: "True (Variance broken down to root drivers)"
+  Formula_Library_Applied: "True (Every number cites its F-rule; F-14 checklist passed)"
 `
 
 ---

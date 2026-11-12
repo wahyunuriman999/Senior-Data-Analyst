@@ -45,3 +45,69 @@ on the mix shift.
 **Fact panel**: `Konversi agregat +0,3 pp | 4/5 region turun | penyebab: mix Jakarta 31%→44% · agregat tidak diklaim sebagai tren`
 
 **Lesson**: never headline the aggregate without the segment table beside it.
+
+## Example 4: OATSIDE Field-Visit Dashboard — the minimum bar, audited live
+
+**Context**: Operational field-force dashboard (OATSIDE oat-milk distribution,
+Indonesia), observed 2026-11-09 via the public Apps Script link. Data
+2026-01-02 s.d. 2026-11-09: **46.060 calls, 9.032 toko unik, 83 karyawan,
+10 region, 3 role**. One long scrollable page: sticky filters (tanggal /
+bulan / region / role / karyawan + reset + scope status), today summary
+(123 calls, 27 petugas aktif), live visit feed (searchable, click row to
+filter), 5 formula cards, Indonesia map + region ranking, role composition,
+monthly trend, daily work-pattern area chart, top-5 travel ranking,
+83-row employee leaderboard, top-100 store table.
+
+**What it does right — this is the MINIMUM the skill must match:**
+
+- Every formula card shows **mean + median (+P90) + exact formula**,
+  e.g. `Jam kerja harian 7,97 J · median 8,16 J · P90 8,99 J ·
+  MAX(Jam_Keluar) − MIN(Jam_Masuk) per tanggal aktif`;
+  `Revisit 5,10x · formula: COUNT(Calls) & COUNT(DISTINCT Store_ID)`.
+- Reconciliation that HOLDS: calls per region sum to exactly 46.060;
+  calls per role 40.124 + 5.326 + 610 = 46.060 ✓;
+  46.060 / 9.032 = 5,099 → **5,10x** ✓.
+- Click-to-filter everywhere (map, bars, table rows, leaderboard names)
+  with a visible scope status — the same interaction contract as Apex v2.
+
+**Six flaws the skill's rules must catch (each was live on the page):**
+
+1. **Distinct-count overlap, unexplained (F-04).** Toko unik per region
+   sum to 6.506+441+421+374+310+309+235+212+162+78 = **9.048**, but total
+   toko unik = **9.032** — selisih 16 toko yang tercatat di >1 region.
+   Bukan bug hitung; bug PENJELASAN. Aturan v3: tampilkan
+   `termasuk 16 toko di >1 region`.
+2. **Shares don't sum (F-11).** Share region berjumlah **100,1%** tanpa
+   catatan sisa pembulatan. Aturan v3: tampilkan `sisa pembulatan ±x pp`.
+3. **Label contradicts data (F-11).** Subjudul role mengklaim "7 jabatan"
+   padahal filter maupun grafik hanya punya 3 role. Aturan v3: label
+   dihitung dari data, bukan ditulis tangan.
+4. **Title promises a series that isn't there (F-11).** Judul tren
+   menyebut "& Jam Kerja" tetapi legenda hanya punya Total Calls &
+   Toko Unik. Aturan v3: judul = seri yang benar-benar tampil.
+5. **In-progress records in the denominator (F-12).** Rata-rata durasi
+   toko "hari ini" **27,0 m** vs rata-rata keseluruhan **88,8 m** —
+   sebagian besar selisihnya adalah 23 kunjungan berstatus
+   "Sedang di Toko" yang durasinya belum final. Aturan v3: record
+   in-progress dikeluarkan dari rata-rata durasi (atau ditandai),
+   dan hari berjalan memakai badge `periode berjalan`.
+6. **Population contamination (metric-definition S5/S6).** Tabel Database
+   Toko berisi entri non-toko: "UPLOAD PO (JADI / ESTIMASI) & PRINT OUT
+   SELLING" (146 calls), "UPLOAD TANDA TERIMA MATERIAL EVENT" (45),
+   "OFFICE INDOSAKTI" (41). Aturan v3: populasi & eksklusi tertulis di
+   kontrak metrik; entri non-toko difilter atau dilabeli kategorinya.
+
+**Bonus lesson — segmentation trap:** MD MOBILE 6,7 calls/hari vs SPG
+MOBILE ±1,0 call/hari dengan avg visit ±500 menit BUKAN "SPG malas" —
+SPG menetap di satu toko (model kerja beda). Satu tolok ukur untuk dua
+model kerja = perbandingan yang salah (segmentation-cohort-funnel §1).
+
+**Fact panel**: `Revisit 5,10x | 46.060 / 9.032 = 5,099 → 5,10x ✓ |
+overlap toko antar-region 16 (F-04) · share region Σ 100,1% (sisa
+pembulatan, F-11) · avg visit hari ini 27,0 m vs 88,8 m — 23 kunjungan
+masih berjalan (F-12)`
+
+**Lesson**: dashboard ini adalah patokan MINIMUM — bukan karena sempurna,
+melainkan karena ia menunjukkan standar yang harus dilewati: rumus
+ditampilkan, median menemani mean, angka menjumlah — DAN enam cacat di
+atas adalah tepat jenis kesalahan yang skill v3 dibangun untuk menangkap.

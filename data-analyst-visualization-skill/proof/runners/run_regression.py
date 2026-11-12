@@ -33,8 +33,11 @@ fc_pass = os.path.exists(fc_log) and "STATUS: PASS" in open(fc_log).read()
 assert_check(fc_pass, "Forecast validation execution log exists and passed")
 
 # 4. Artifact Integrity
-exec_html = "data-analyst-visualization-skill/proof/examples/executive_sales/executive_sales.html"
-analyst_html = "data-analyst-visualization-skill/proof/examples/analyst_deep_dive/analyst_deep_dive.html"
+# NOTE (v3, 2026-11-09): the two artifacts moved under legacy-v1/ in commit
+# aa33187; the paths here were stale and the check had been failing ever
+# since. Paths corrected — the check verifies the same two files.
+exec_html = "data-analyst-visualization-skill/proof/examples/legacy-v1/executive_sales/executive_sales.html"
+analyst_html = "data-analyst-visualization-skill/proof/examples/legacy-v1/analyst_deep_dive/analyst_deep_dive.html"
 art_pass = False
 if os.path.exists(exec_html) and os.path.exists(analyst_html):
     with open(exec_html, 'r', encoding='utf-8') as f:

@@ -86,7 +86,32 @@ function filtered() {
     return state.bulan === "ALL" || r.bulan === state.bulan;
   });
 }
-function div0(a, b) { return b ? (a - b) / b : 0; }
+// F-02: growth dari basis 0 TIDAK terdefinisi — kembalikan null, UI tampil "n/a".
+// Mengembalikan 0% adalah bug: 0% artinya "tidak berubah", padahal dari 0 ke
+// berapa pun adalah tak terdefinisi. Semua pemanggil WAJIB menangani null.
+function div0(a, b) { return b ? (a - b) / b : null; }
+function median(xs) {
+  if (!xs.length) return 0;
+  var s = xs.slice().sort(function (a, b) { return a - b; });
+  var m = Math.floor(s.length / 2);
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+}
+function percentile(xs, p) { // p in [0,1], nearest-rank
+  if (!xs.length) return 0;
+  var s = xs.slice().sort(function (a, b) { return a - b; });
+  return s[Math.min(s.length - 1, Math.max(0, Math.ceil(p * s.length) - 1))];
+}
+// t-critical dua sisi 95% (F-08). n kecil -> JAUH di atas 1,96 (df=4 -> 2,776).
+function tCrit95(df) {
+  var t = { 1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447,
+            7: 2.365, 8: 2.306, 9: 2.262, 10: 2.228, 12: 2.179, 15: 2.131,
+            20: 2.086, 30: 2.042 };
+  if (t[df]) return t[df];
+  if (df > 30) return 1.96;
+  var ks = Object.keys(t).map(Number).sort(function (a, b) { return a - b; });
+  for (var i = 0; i < ks.length; i++) if (ks[i] > df) return t[ks[i]];
+  return 1.96;
+}
 function monthAgg(rows, bulan) {
   var rs = rows.filter(function (r) { return r.bulan === bulan; });
   var omzet = sum(rs, function (r) { return r.omzet; });
@@ -111,26 +136,27 @@ function groupMonth(rows) {
   });
 }
 function kpis(rows) {
+  // F-00.4 / F-02: nilai KPI dan delta HARUS se-grain. v2 menampilkan TOTAL
+  // 12 bulan dengan delta MoM bulan terakhir — % itu tidak berlaku untuk
+  // angka totalnya. v3: kartu KPI = BULAN TERAKHIR di window + MoM-nya;
+  // total periode tetap tersedia sebagai k.total* untuk panel Fakta.
   var g = groupMonth(rows);
   var n = g.length;
-  var cur = { omzet: 0, profit: 0, units: 0 };
-  var prv = { omzet: 0, profit: 0, units: 0 };
-  g.forEach(function (m) { cur.omzet += m.omzet; cur.profit += m.profit; cur.units += m.units; });
-  if (n >= 2) {
-    var l = g[n - 1], p = g[n - 2];
-    prv.omzet = p.omzet; prv.profit = p.profit; prv.units = p.units;
-    cur.lastLabel = l.label; prv.lastLabel = p.label;
-  }
-  function d(c, p) { return p ? (c - p) / p : 0; }
+  var tot = { omzet: 0, profit: 0, units: 0 };
+  g.forEach(function (m) { tot.omzet += m.omzet; tot.profit += m.profit; tot.units += m.units; });
+  var last = n ? g[n - 1] : { omzet: 0, profit: 0, units: 0, margin: 0, label: "" };
+  var prev = n >= 2 ? g[n - 2] : null;
+  function d(c, p) { return p ? (c - p) / p : null; } // basis 0 -> null (F-02)
   return {
-    omzet: cur.omzet, profit: cur.profit, units: cur.units,
-    margin: cur.omzet ? cur.profit / cur.omzet : 0,
-    mom: n >= 2 ? {
-      omzet: d(g[n-1].omzet, g[n-2].omzet),
-      profit: d(g[n-1].profit, g[n-2].profit),
-      units: d(g[n-1].units, g[n-2].units),
-      marginPp: (g[n-1].margin - g[n-2].margin) * 100,
-      label: g[n-1].label + " vs " + g[n-2].label
+    omzet: last.omzet, profit: last.profit, units: last.units, margin: last.margin,
+    totalOmzet: tot.omzet, totalProfit: tot.profit, totalUnits: tot.units,
+    totalMargin: tot.omzet ? tot.profit / tot.omzet : 0,
+    mom: prev ? {
+      omzet: d(last.omzet, prev.omzet),
+      profit: d(last.profit, prev.profit),
+      units: d(last.units, prev.units),
+      marginPp: (last.margin - prev.margin) * 100,
+      label: last.label + " vs " + prev.label
     } : null,
     series: g
   };
@@ -165,16 +191,37 @@ function varianceDecomp(rows, mA, mB) {
            volEff: volEff, mixEff: mixEff, priceEff: priceEff, perCat: perCat,
            residual: (R1 - R0) - (volEff + mixEff + priceEff) };
 }
-// Anomali: z-score omzet bulanan, |z| > 2
+// Anomali: MAD robust (F-06). z klasik memakai mean/SD yang ikut ditarik
+// outlier itu sendiri — pada deret bulanan n=12, satu bulan promo besar
+// menaikkan mean & SD sehingga z-nya sendiri mengecil. Default v3: modified
+// z dari median/MAD, ambang |z_mod| > 3,5. z klasik tetap dilaporkan sebagai
+// pembanding.
 function anomalies(g) {
   var xs = g.map(function (m) { return m.omzet; });
+  var med = median(xs);
+  var mad = median(xs.map(function (x) { return Math.abs(x - med); }));
   var mean = xs.reduce(function (a, b) { return a + b; }, 0) / xs.length;
-  var sd = Math.sqrt(xs.reduce(function (a, b) { return a + (b - mean) * (b - mean); }, 0) / xs.length);
+  var sd = Math.sqrt(xs.reduce(function (a, b) { return a + (b - mean) * (b - mean); }, 0) / Math.max(xs.length - 1, 1));
   return g.map(function (m) {
-    return { label: m.label, bulan: m.bulan, omzet: m.omzet, z: sd ? (m.omzet - mean) / sd : 0 };
-  }).filter(function (o) { return Math.abs(o.z) > 2; });
+    return { label: m.label, bulan: m.bulan, omzet: m.omzet,
+             z: sd ? (m.omzet - mean) / sd : 0,
+             zmod: mad ? 0.6745 * (m.omzet - med) / mad : 0 };
+  }).filter(function (o) { return Math.abs(o.zmod) > 3.5; });
 }
-// Forecast 3 bulan: regresi linier 6 bulan terakhir + CI 95%
+// Label bulan ke depan, diturunkan dari periode terakhir data (F-08.5).
+// Hardcode label ("Nov 26", ...) adalah bug bila periodenya berbeda.
+function nextMonthLabels(lastPeriod, count) {
+  var MON = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+  var y = parseInt(lastPeriod.slice(0, 4), 10), m = parseInt(lastPeriod.slice(5, 7), 10);
+  var out = [];
+  for (var i = 0; i < count; i++) {
+    m += 1; if (m > 12) { m = 1; y += 1; }
+    out.push(MON[m - 1] + " " + String(y).slice(2));
+  }
+  return out;
+}
+// Forecast 3 bulan: regresi linier 6 bulan terakhir + interval PREDIKSI 95%
+// berbasis t (F-08) + backtest temporal (latih semua kecuali 3 terakhir).
 function forecast(g) {
   var tail = g.slice(-6);
   var n = tail.length;
@@ -185,12 +232,36 @@ function forecast(g) {
   var a = (sy - b * sx) / n;
   var resid = tail.map(function (m, i) { return m.omzet - (a + b * i); });
   var sigma = Math.sqrt(resid.reduce(function (s, r) { return s + r * r; }, 0) / Math.max(n - 2, 1));
+  // Interval prediksi (bukan interval rata-rata): 1 + 1/n + leverage (x0-xbar)^2/Sxx.
+  // v2 memakai f +- 1,96*sigma: salah tiga kali (z bukan t, tanpa leverage,
+  // tanpa +1). v3: t* df=n-2, interval melebar per horizon, lo di-clip di 0.
+  var xbar = sx / n;
+  var sxxC = sxx - sx * sx / n;
+  var tStar = tCrit95(Math.max(n - 2, 1));
   var out = [];
   for (var h = 1; h <= 3; h++) {
-    var f = a + b * (n - 1 + h);
-    out.push({ h: h, fc: f, lo: f - 1.96 * sigma, hi: f + 1.96 * sigma });
+    var x0 = n - 1 + h;
+    var f = a + b * x0;
+    var half = tStar * sigma * Math.sqrt(1 + 1 / n + (x0 - xbar) * (x0 - xbar) / (sxxC || 1));
+    out.push({ h: h, fc: f, lo: Math.max(0, f - half), hi: f + half });
   }
-  return { points: out, sigma: sigma, slope: b };
+  // Backtest: latih di semua kecuali 3 terakhir, prediksi 3 terakhir itu.
+  var bt = null;
+  if (g.length >= 6) {
+    var tr = g.slice(0, g.length - 3), te = g.slice(-3);
+    var nn = tr.length, sx2 = 0, sy2 = 0, sxx2 = 0, sxy2 = 0;
+    tr.forEach(function (m, i) { sx2 += i; sy2 += m.omzet; sxx2 += i * i; sxy2 += i * m.omzet; });
+    var dn2 = nn * sxx2 - sx2 * sx2;
+    var b2 = dn2 ? (nn * sxy2 - sx2 * sy2) / dn2 : 0;
+    var a2 = (sy2 - b2 * sx2) / nn;
+    var errs = te.map(function (m, i) { return Math.abs(m.omzet - (a2 + b2 * (nn + i))); });
+    var smape = te.reduce(function (s, m, i) {
+      var f2 = a2 + b2 * (nn + i);
+      return s + Math.abs(m.omzet - f2) / ((Math.abs(m.omzet) + Math.abs(f2)) / 2 || 1);
+    }, 0) / te.length * 100;
+    bt = { mae: errs.reduce(function (s, e) { return s + e; }, 0) / errs.length, smape: smape };
+  }
+  return { points: out, sigma: sigma, slope: b, tStar: tStar, backtest: bt };
 }
 function pearson(xs, ys) {
   var n = xs.length;
@@ -231,7 +302,7 @@ function renderTrend(g, fc, selBulan) {
   var labels = g.map(function (m) { return m.label; });
   var vals = g.map(function (m) { return Math.round(m.omzet / 1e9 * 100) / 100; });
   var target = vals.reduce(function (a, b) { return a + b; }, 0) / vals.length * 1.08;
-  var fl = labels.concat(["Nov 26", "Des 26", "Jan 27"]);
+  var fl = labels.concat(nextMonthLabels(g[g.length - 1].bulan, 3));
   var fvals = vals.concat(fc.points.map(function (p) { return Math.round(p.fc / 1e9 * 100) / 100; }));
   var lo = vals.map(function () { return null; }).concat(fc.points.map(function (p) { return Math.round(p.lo / 1e9 * 100) / 100; }));
   var hi = vals.map(function () { return null; }).concat(fc.points.map(function (p) { return Math.round(p.hi / 1e9 * 100) / 100; }));
@@ -439,19 +510,37 @@ function renderDonut(rows) {
 }
 
 /* ---------------- Fakta Terverifikasi: angka hitungan, tanpa narasi AI ---------------- */
-function buildFacts(rows, k, g, vd, anoms) {
+function buildFacts(rows, k, g, vd, anoms, fc) {
   var F = [];
   function push(label, value, formula, tone) { F.push({ label: label, value: value, formula: formula, tone: tone || "neu" }); }
   var n = g.length;
 
   if (k.mom) {
     push("Perubahan " + L.revenue + " (" + k.mom.label + ")",
-      fmtIDR(g[n-1].omzet) + " (" + fmtPct(k.mom.omzet) + ")",
-      "omzet bulan berjalan vs bulan sebelumnya", k.mom.omzet >= 0 ? "pos" : "neg");
+      fmtIDR(g[n-1].omzet) + " (" + (k.mom.omzet === null ? "n/a — basis 0" : fmtPct(k.mom.omzet)) + ")",
+      "omzet bulan berjalan vs bulan sebelumnya", (k.mom.omzet === null || k.mom.omzet >= 0) ? "pos" : "neg");
   }
-  push("Total periode", fmtIDR(k.omzet) + " · margin " +
-    (k.margin * 100).toLocaleString(L.locale, { maximumFractionDigits: 1 }) + "%",
+  push("Total periode", fmtIDR(k.totalOmzet) + " · margin " +
+    (k.totalMargin * 100).toLocaleString(L.locale, { maximumFractionDigits: 1 }) + "%",
     "Σ omzet & profit pada cakupan aktif", "neu");
+
+  // F-01 + F-03: mean tidak pernah sendirian; AOV dihitung ulang dari grain.
+  var monthly = g.map(function (m) { return m.omzet; });
+  push("Omzet bulanan — median & P90",
+    "median " + fmtIDR(median(monthly)) + " · P90 " + fmtIDR(percentile(monthly, 0.9)),
+    "median/P90 dari " + n + " bulan · mean " + fmtIDR(monthly.reduce(function (a, b) { return a + b; }, 0) / n) + " hanya pelengkap", "neu");
+  var totRev = sum(rows, function (r) { return r.omzet; });
+  var totUnits = sum(rows, function (r) { return r.units; });
+  push("AOV (" + L.revenue + " per " + L.units.toLowerCase() + ")",
+    fmtIDR(totUnits ? totRev / totUnits : 0),
+    "Σ revenue / Σ units pada cakupan aktif — BUKAN rata-rata AOV per baris (F-03)", "neu");
+
+  if (fc && fc.backtest) {
+    push("Backtest forecast (3 bln terakhir)",
+      "MAE " + fmtIDR(fc.backtest.mae) + " · sMAPE " + fc.backtest.smape.toLocaleString(L.locale, { maximumFractionDigits: 1 }) + "%",
+      "latih semua kecuali 3 terakhir, prediksi 3 terakhir · sMAPE > 20% = tidak andal · PI pakai t*=" + fc.tStar.toLocaleString(L.locale, { maximumFractionDigits: 2 }) + " (F-08)",
+      fc.backtest.smape > 20 ? "warn" : "pos");
+  }
 
   if (vd) {
     push("Dekomposisi " + fmtIDR(vd.dR),
@@ -462,22 +551,22 @@ function buildFacts(rows, k, g, vd, anoms) {
 
   if (anoms.length) {
     push("Anomali bulan",
-      anoms.map(function (a) { return a.label + " (z=" + a.z.toLocaleString(L.locale, { maximumFractionDigits: 1 }) + ")"; }).join(", "),
-      "aturan: |z|>2 pada omzet bulanan", "warn");
+      anoms.map(function (a) { return a.label + " (z_mod=" + a.zmod.toLocaleString(L.locale, { maximumFractionDigits: 1 }) + ")"; }).join(", "),
+      "aturan: |z_mod|>3,5 (median/MAD, F-06) · z klasik sebagai pembanding", "warn");
   } else {
-    push("Anomali bulan", "tidak ada", "aturan: |z|>2 pada omzet bulanan", "neu");
+    push("Anomali bulan", "tidak ada", "aturan: |z_mod|>3,5 (median/MAD, F-06)", "neu");
   }
 
   if (n >= 2 && k.mom) {
     var div = KOTA.map(function (ct) {
       var r0 = sum(rows.filter(function (r) { return r.kota === ct && r.bulan === g[n-2].bulan; }), function (r) { return r.omzet; });
       var r1 = sum(rows.filter(function (r) { return r.kota === ct && r.bulan === g[n-1].bulan; }), function (r) { return r.omzet; });
-      return { kota: ct, growth: r0 ? (r1 - r0) / r0 : 0 };
-    }).filter(function (o) { return (k.mom.omzet >= 0 && o.growth < 0) || (k.mom.omzet < 0 && o.growth >= 0); });
+      return { kota: ct, growth: r0 ? (r1 - r0) / r0 : null };
+    }).filter(function (o) { return o.growth !== null && ((k.mom.omzet >= 0 && o.growth < 0) || (k.mom.omzet < 0 && o.growth >= 0)); });
     if (div.length) {
       push(L.dim1 + " berlawanan arah agregat",
         div.map(function (o) { return o.kota + " " + fmtPct(o.growth); }).join(", "),
-        "agregat " + fmtPct(k.mom.omzet) + " vs kota di atas", "warn");
+        "agregat " + (k.mom.omzet === null ? "n/a" : fmtPct(k.mom.omzet)) + " vs kota di atas", "warn");
     } else {
       push("Arah antar-" + L.dim1.toLowerCase(), "selaras dengan agregat", "perbandingan MoM per " + L.dim1.toLowerCase(), "neu");
     }
@@ -500,8 +589,8 @@ function buildFacts(rows, k, g, vd, anoms) {
       var o1 = sum(rs1, function (r) { return r.omzet; });
       var o0 = sum(rows.filter(function (r) { return r.kota === ct && r.bulan === g[n-2].bulan; }), function (r) { return r.omzet; });
       var p1 = o1 - sum(rs1, function (r) { return r.cogs; });
-      return { kota: ct, growth: o0 ? (o1 - o0) / o0 : 0, margin: o1 ? p1 / o1 : 0 };
-    }).filter(function (o) { return o.growth < -0.05 && o.margin < 0.20; });
+      return { kota: ct, growth: o0 ? (o1 - o0) / o0 : null, margin: o1 ? p1 / o1 : 0 };
+    }).filter(function (o) { return o.growth !== null && o.growth < -0.05 && o.margin < 0.20; });
     push(L.dim1 + " berisiko", risky.length ? risky.map(function (o) { return o.kota; }).join(", ") : "tidak ada",
       "aturan: MoM < -5% ∧ margin < 20%", risky.length ? "neg" : "pos");
   }
@@ -536,7 +625,7 @@ function renderTable(rows, g) {
     if (n >= 2) {
       var o1 = sum(rs.filter(function (r) { return r.bulan === g[n-1].bulan; }), function (r) { return r.omzet; });
       var o0 = sum(rs.filter(function (r) { return r.bulan === g[n-2].bulan; }), function (r) { return r.omzet; });
-      mom = o0 ? (o1 - o0) / o0 : 0;
+      mom = o0 ? (o1 - o0) / o0 : null;
     }
     var sel = state.kota === ct;
     html += '<tr data-kota="' + esc(ct) + '" class="' + (sel ? "sel" : "") + '">' +
@@ -654,7 +743,7 @@ function renderAll() {
   renderCityBar(rows);
   renderDonut(rows);
   renderTable(rows, g);
-  renderFacts(buildFacts(rows, k, g, vd, anomalies(gTime)));
+  renderFacts(buildFacts(rows, k, g, vd, anomalies(gTime), fc));
 
   var sub = [];
   if (state.kota !== "ALL") sub.push(state.kota);
@@ -663,6 +752,81 @@ function renderAll() {
   sub.push(state.periode === "12" ? L.period12 : L.period6);
   document.getElementById("scope-label").textContent = L.scope + ": " + sub.join(" · ") +
     " · " + rows.length + " " + L.rows;
+}
+
+/* ---------------- sidebar v2: rail, drawer, scrollspy ----------------
+ * Tanpa DOMContentLoaded (script ini dieksekusi di akhir body, DOM sudah
+ * ada). Semua akses DOM di-guarded: dashboard tanpa sidebar tetap jalan.
+ * State rail disimpan di localStorage; gagal baca/tulis (private mode)
+ * tidak boleh mematikan render chart. */
+function initSidebar() {
+  var app = document.getElementById("app");
+  var sb = document.getElementById("sidebar");
+  if (!app || !sb) return;
+  var KEY = "apex-sidebar-rail";
+  var collapseBtn = document.getElementById("btn-sidebar-collapse");
+  var menuBtn = document.getElementById("btn-sidebar-menu");
+  var backdrop = document.getElementById("sidebar-backdrop");
+  var links = Array.prototype.slice.call(sb.querySelectorAll(".nav-item"));
+  function setActive(link) {
+    links.forEach(function (a) { a.classList.remove("on"); });
+    if (link) link.classList.add("on");
+  }
+  function sectionEl(link) {
+    var id = (link.getAttribute("href") || "").slice(1);
+    var el = id ? document.getElementById(id) : null;
+    // #sec-kohort memakai display:contents (tidak punya box): pakai anaknya.
+    if (el && window.getComputedStyle(el).display === "contents") el = el.firstElementChild;
+    return el;
+  }
+  try {
+    if (window.localStorage && localStorage.getItem(KEY) === "1") {
+      app.classList.add("rail");
+      if (collapseBtn) {
+        collapseBtn.setAttribute("aria-expanded", "false");
+        collapseBtn.textContent = "»";
+        collapseBtn.title = "Bentangkan sidebar";
+      }
+    }
+  } catch (e) { /* private mode: abaikan, rail default mati */ }
+  if (collapseBtn) collapseBtn.addEventListener("click", function () {
+    var rail = app.classList.toggle("rail");
+    collapseBtn.setAttribute("aria-expanded", rail ? "false" : "true");
+    collapseBtn.textContent = rail ? "»" : "«";
+    collapseBtn.title = rail ? "Bentangkan sidebar" : "Ciutkan sidebar";
+    try { if (window.localStorage) localStorage.setItem(KEY, rail ? "1" : "0"); } catch (e) {}
+  });
+  function closeDrawer() {
+    app.classList.remove("drawer-open");
+    if (menuBtn) menuBtn.setAttribute("aria-expanded", "false");
+  }
+  if (menuBtn) menuBtn.addEventListener("click", function () {
+    var open = app.classList.toggle("drawer-open");
+    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  if (backdrop) backdrop.addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key === "Escape") closeDrawer();
+  });
+  links.forEach(function (a) {
+    a.addEventListener("click", function () { setActive(a); closeDrawer(); });
+  });
+  // Scrollspy: section yang sedang dibaca jadi .on. rAF-throttle.
+  var ticking = false;
+  function spy() {
+    ticking = false;
+    var best = null, bestTop = -Infinity;
+    links.forEach(function (a) {
+      var el = sectionEl(a);
+      if (!el) return;
+      var top = el.getBoundingClientRect().top;
+      if (top <= 140 && top > bestTop) { best = a; bestTop = top; }
+    });
+    if (best) setActive(best);
+  }
+  window.addEventListener("scroll", function () {
+    if (!ticking) { ticking = true; window.requestAnimationFrame(spy); }
+  }, { passive: true });
 }
 
 /* ---------------- init (tanpa DOMContentLoaded — Q-VIS-FATAL) ---------------- */
@@ -678,6 +842,7 @@ function renderAll() {
   sb.addEventListener("change", function () { state.bulan = this.value; renderAll(); });
   document.getElementById("sel-periode").addEventListener("change", function () { state.periode = this.value; renderAll(); });
   document.getElementById("btn-reset").addEventListener("click", resetAll);
+  initSidebar();
   window.addEventListener("resize", function () {
     Object.keys(charts).forEach(function (id) { charts[id].resize(); });
   });
